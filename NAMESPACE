@@ -1,0 +1,4 @@
+useDynLib(VBsNMF, .registration=TRUE)
+importFrom(Rcpp, evalCpp)
+import(Matrix)
+export("vb_nmf_pois")
