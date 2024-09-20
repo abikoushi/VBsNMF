@@ -111,10 +111,20 @@ double kld(const arma::mat & alpha_z,
   }
   for(int i=0; i<alpha_w.n_rows; i++){
     for(int l=0; l<alpha_w.n_cols; l++){
-      lp += kl2gamma(a, b, alpha_w(i,l), beta_w(l));      
+      lp += kl2gamma(a, b, alpha_w(i,l), beta_w(l));     
     }
   }
   return lp;
+}
+
+arma::mat rand_init(const arma::mat & alpha, const arma::rowvec & beta){
+  arma::mat Z = alpha;
+  for (int i=0; i<alpha.n_rows; i++) {
+    for (int j=0; j<alpha.n_cols; j++) {
+      Z(i,j) = arma::randg(arma::distr_param(alpha(i,j), 1/beta(j)));
+    }
+  }
+  return Z;
 }
 
 // [[Rcpp::export]]
@@ -126,23 +136,19 @@ List doVB_pois(const arma::vec & y,
                const int & iter,
                const double & a,
                const double & b,
-               arma::mat & Z, arma::mat & W){
+               arma::mat & alpha_z, arma::rowvec & beta_z,
+               arma::mat & alpha_w, arma::rowvec & beta_w){
+  arma::mat Z = rand_init(alpha_z, beta_z);
+  arma::mat W = rand_init(alpha_w, beta_w);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
-  arma::mat alpha_z = arma::ones<arma::mat>(N, L);
-  arma::mat beta_z = arma::ones<arma::rowvec>(L);
-  arma::mat alpha_w = arma::ones<arma::mat>(M, L);
-  arma::mat beta_w = arma::ones<arma::rowvec>(L);
   arma::mat lp(iter,3);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
     double lp_b = up_B(alpha_z, alpha_w, beta_z, beta_w, Z, W, rowi, coli, b);
-    //lowerbound_logML_pois(y, alpha_z, beta_z, alpha_w, beta_w, Z, W, logZ, logW, a, b);
     lp.col(0).row(i) = lp_a ;
     lp.col(1).row(i) = lp_b;
     lp.col(2).row(i) = kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
-    //Z = alpha_z.each_row()/beta_z;
-    //W = alpha_w.each_row()/beta_w;
     logZ = mat_digamma(alpha_z).each_row() - log(beta_z);
     logW = mat_digamma(alpha_w).each_row() - log(beta_w);
   }
