@@ -2,22 +2,24 @@
 \alias{vb_nmf_pois}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-A Capitalized Title (ideally limited to 65 characters)
+Variational Bayes method for sparase nonegative matrix facttorization
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Efficient implementation enjoying the sparsity of the Variational Bayes method for nonnegative matrix factorization.
 }
 \usage{
-vb_nmf_pois(x)
+vb_nmf_pois(Y, rank,
+            iter=100,
+            prior_shape=0.5,
+            prior_rate=1e-5)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-%%     ~~Describe \code{x} here~~
+  \item{Y}{
+  input matix
 }
+  \item{rank}{
+  rank of the output matices
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
 %%  ~Describe the value returned
@@ -27,19 +29,7 @@ vb_nmf_pois(x)
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
-}
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
-\seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+Cemgil, A. T. (2009). Bayesian inference for nonnegative matrix factorisation models. Computational intelligence and neuroscience, 2009(1), 785152.
 }
 \examples{
 ##---- Should be DIRECTLY executable !! ----

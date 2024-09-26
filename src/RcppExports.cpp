@@ -12,31 +12,52 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // doVB_pois
-List doVB_pois(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& N, const int& M, const int& L, const int& iter, const double& a, const double& b, arma::mat& alpha_z, arma::rowvec& beta_z, arma::mat& alpha_w, arma::rowvec& beta_w);
-RcppExport SEXP _VBsNMF_doVB_pois(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP NSEXP, SEXP MSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
+List doVB_pois(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& L, const int& iter, const double& a, const double& b, arma::mat alpha_z, arma::rowvec beta_z, arma::mat alpha_w, arma::rowvec beta_w);
+RcppExport SEXP _VBsNMF_doVB_pois(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type rowi(rowiSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type coli(coliSEXP);
-    Rcpp::traits::input_parameter< const int& >::type N(NSEXP);
-    Rcpp::traits::input_parameter< const int& >::type M(MSEXP);
     Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
     Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
     Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
     Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type alpha_z(alpha_zSEXP);
-    Rcpp::traits::input_parameter< arma::rowvec& >::type beta_z(beta_zSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type alpha_w(alpha_wSEXP);
-    Rcpp::traits::input_parameter< arma::rowvec& >::type beta_w(beta_wSEXP);
-    rcpp_result_gen = Rcpp::wrap(doVB_pois(y, rowi, coli, N, M, L, iter, a, b, alpha_z, beta_z, alpha_w, beta_w));
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_z(alpha_zSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_z(beta_zSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_w(alpha_wSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_w(beta_wSEXP);
+    rcpp_result_gen = Rcpp::wrap(doVB_pois(y, rowi, coli, L, iter, a, b, alpha_z, beta_z, alpha_w, beta_w));
+    return rcpp_result_gen;
+END_RCPP
+}
+// doVB_pois_s
+List doVB_pois_s(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& L, const int& iter, const double& a, const double& b, const double& N1, arma::mat alpha_z, arma::rowvec beta_z, arma::mat alpha_w, arma::rowvec beta_w);
+RcppExport SEXP _VBsNMF_doVB_pois_s(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type rowi(rowiSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type coli(coliSEXP);
+    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const double& >::type N1(N1SEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_z(alpha_zSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_z(beta_zSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_w(alpha_wSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_w(beta_wSEXP);
+    rcpp_result_gen = Rcpp::wrap(doVB_pois_s(y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha_w, beta_w));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 13},
+    {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 11},
+    {"_VBsNMF_doVB_pois_s", (DL_FUNC) &_VBsNMF_doVB_pois_s, 12},
     {NULL, NULL, 0}
 };
 
