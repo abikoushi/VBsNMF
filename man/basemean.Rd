@@ -1,4 +1,4 @@
-\name{basemean, coefmean}?bas
+\name{basemean, coefmean}
 \alias{basemean}
 \alias{coefmean}
 \title{

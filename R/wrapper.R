@@ -21,8 +21,6 @@ learning_rate <- function(t, delay=1, forgetting=0.9){
   (t+delay)^(-forgetting)
 }
 
-#write file loader
-
 svb_nmf_pois<- function(Y, rank,
                         b_size = 100,
                         subiter = 10,
@@ -38,10 +36,8 @@ svb_nmf_pois<- function(Y, rank,
   beta_z = matrix(b, 1, rank)
   alpha_w = matrix(a, Y@Dim[2], rank)
   beta_w = matrix(b, 1, rank)
-  
   N1 <- length(Y@x)
   rind <-sample.int(N1)
-
   sb <- floor(N1/b_size)
   m_sb <-b_size*sb
   subind <- vector("list",sb+1)
@@ -49,23 +45,23 @@ svb_nmf_pois<- function(Y, rank,
     subind[[i]] <- rind[1:b_size+b_size*(i-1)]  
   }
   subind[[sb+1]] <- rind[(b_size*sb):length(rind)]
-  
   lp <- numeric(n_epochs)
-  pb <- txtProgressBar(1, n_epochs, style = 3)
+  pb <- txtProgressBar(0, n_epochs, style = 3)
   for(ep in 1:n_epochs){
-    rho <- learning_rate(ep, delay = delay, forgetting = forgetting)
+    rho <- learning_rate(ep, delay=delay, forgetting=forgetting)
     for(k in 1:length(subind)){
       out_t <- VBsNMF:::doVB_pois_s(Y@x[subind[[k]]],Y@i[subind[[k]]],Y@j[subind[[k]]],
-                                    L=2, iter = subiter,
+                                    L=rank, iter = subiter,
                                     a,b,
                                     N1,
                                     alpha_z, beta_z,
                                     alpha_w, beta_w)
       Ns <- length(subind[[k]])
-      alpha_z <- (1-rho)*alpha_z + rho*out_t$shape_row
-      beta_z <- (1-rho)*beta_z + rho*out_t$rate_row
-      alpha_w <- (1-rho)*alpha_w + rho*out_t$shape_col
-      beta_w <- (1-rho)*beta_w + rho*out_t$rate_col
+      rho2 <- rho*(Ns/N1)
+      alpha_z <- (1-rho2)*alpha_z + rho2*out_t$shape_row
+      beta_z <- (1-rho2)*beta_z + rho2*out_t$rate_row
+      alpha_w <- (1-rho2)*alpha_w + rho2*out_t$shape_col
+      beta_w <- (1-rho2)*beta_w + rho2*out_t$rate_col
       lp[ep] <- lp[ep] + out_t$logprob[subiter]
     } 
     setTxtProgressBar(pb,ep)

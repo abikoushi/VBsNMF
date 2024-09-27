@@ -142,8 +142,7 @@ double up_B_s(const arma::mat alpha_z,
               arma::mat & beta_w,
               arma::mat & Z,
               arma::mat & W,
-              const double & ns,
-              const double & N1, 
+              const double & weight, 
               const arma::uvec & rowi,
               const arma::uvec & coli,
               const double & b){
@@ -157,7 +156,7 @@ double up_B_s(const arma::mat alpha_z,
     // for(int i=0; i < rowi.n_rows; i++){
     //   B1 += Z(rowi(i),l);
     // }
-    B1 += (ns/N1)*NegativeSampling(Z.col(l));
+    B1 += weight*NegativeSampling(Z.col(l));
     lp -= B1;
     beta_w.col(l) += B1;
     W.col(l) = alpha_w.col(l)/beta_w(l);
@@ -166,7 +165,7 @@ double up_B_s(const arma::mat alpha_z,
     // for(int i=0; i < coli.n_rows; i++){
     //   B2 += W(coli(i),l);
     // }
-    B2 +=  (ns/N1)*NegativeSampling(W.col(l));
+    B2 += weight*NegativeSampling(W.col(l));
     lp -= B2;
     beta_z.col(l) += B2;
     Z.col(l) = alpha_z.col(l)/beta_z(l);
@@ -193,16 +192,13 @@ List doVB_pois_s(const arma::vec & y,
   arma::mat W = rand_init(alpha_w, beta_w);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
-  //arma::mat lp(iter,3);
+  double weight = (ns/N1);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A_s(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, uid_r, uid_c, a);
     //Rprintf("a\n");
-    double lp_b = up_B_s(alpha_z, alpha_w, beta_z, beta_w, Z, W, ns, N1, rowi, coli, b);
+    double lp_b = up_B_s(alpha_z, alpha_w, beta_z, beta_w, Z, W, weight, rowi, coli, b);
     //Rprintf("b\n");
-    //lp.col(0).row(i) = lp_a;
-    //lp.col(1).row(i) = lp_b;
-    //lp.col(2).row(i) = kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
     lp(i) = lp_a+lp_b+kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
     logZ = mat_digamma(alpha_z).each_row() - log(beta_z);
     logW = mat_digamma(alpha_w).each_row() - log(beta_w);

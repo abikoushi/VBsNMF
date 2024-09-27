@@ -31,6 +31,9 @@ svb_nmf_pois(Y, rank,
   \item{rank}{
   rank of the output matices
 }
+  \item{rank}{
+  rank of the output matices
+}
 }
 \value{
 %%  ~Describe the value returned
