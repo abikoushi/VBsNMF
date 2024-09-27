@@ -21,6 +21,8 @@ learning_rate <- function(t, delay=1, forgetting=0.9){
   (t+delay)^(-forgetting)
 }
 
+#write file loader
+
 svb_nmf_pois<- function(Y, rank,
                         b_size = 100,
                         subiter = 10,

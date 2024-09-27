@@ -1,5 +1,6 @@
-\name{vb_nmf_pois}
+\name{vb_nmf_pois, svb_nmf_pois}
 \alias{vb_nmf_pois}
+\alias{svb_nmf_pois}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Variational Bayes method for sparase nonegative matrix facttorization
@@ -12,6 +13,16 @@ vb_nmf_pois(Y, rank,
             iter=100,
             prior_shape=0.5,
             prior_rate=1e-5)
+
+            
+svb_nmf_pois(Y, rank,
+            b_size = 100,
+            subiter = 10,
+            n_epochs = 10,
+            delay=1,
+            forgetting=0.9,
+            prior_shape=0.5,
+            prior_rate=0.1)
 }
 \arguments{
   \item{Y}{
