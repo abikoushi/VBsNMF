@@ -5,6 +5,10 @@ doVB_pois <- function(y, rowi, coli, L, iter, a, b, alpha_z, beta_z, alpha_w, be
     .Call(`_VBsNMF_doVB_pois`, y, rowi, coli, L, iter, a, b, alpha_z, beta_z, alpha_w, beta_w)
 }
 
+doVB_pois_na <- function(y, rowi, coli, L, iter, a, b, wrow, wcol, alpha_z, beta_z, alpha_w, beta_w) {
+    .Call(`_VBsNMF_doVB_pois_na`, y, rowi, coli, L, iter, a, b, wrow, wcol, alpha_z, beta_z, alpha_w, beta_w)
+}
+
 doVB_pois_s <- function(y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha_w, beta_w) {
     .Call(`_VBsNMF_doVB_pois_s`, y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha_w, beta_w)
 }

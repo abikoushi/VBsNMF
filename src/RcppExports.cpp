@@ -32,6 +32,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// doVB_pois_na
+List doVB_pois_na(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& L, const int& iter, const double& a, const double& b, const arma::vec& wrow, const arma::vec& wcol, arma::mat alpha_z, arma::rowvec beta_z, arma::mat alpha_w, arma::rowvec beta_w);
+RcppExport SEXP _VBsNMF_doVB_pois_na(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP wrowSEXP, SEXP wcolSEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type rowi(rowiSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type coli(coliSEXP);
+    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type wrow(wrowSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type wcol(wcolSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_z(alpha_zSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_z(beta_zSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type alpha_w(alpha_wSEXP);
+    Rcpp::traits::input_parameter< arma::rowvec >::type beta_w(beta_wSEXP);
+    rcpp_result_gen = Rcpp::wrap(doVB_pois_na(y, rowi, coli, L, iter, a, b, wrow, wcol, alpha_z, beta_z, alpha_w, beta_w));
+    return rcpp_result_gen;
+END_RCPP
+}
 // doVB_pois_s
 List doVB_pois_s(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& L, const int& iter, const double& a, const double& b, const double& N1, arma::mat alpha_z, arma::rowvec beta_z, arma::mat alpha_w, arma::rowvec beta_w);
 RcppExport SEXP _VBsNMF_doVB_pois_s(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
@@ -57,6 +80,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 11},
+    {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 13},
     {"_VBsNMF_doVB_pois_s", (DL_FUNC) &_VBsNMF_doVB_pois_s, 12},
     {NULL, NULL, 0}
 };

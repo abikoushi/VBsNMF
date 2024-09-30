@@ -1,11 +1,5 @@
 library(NMF)
 library(VBsNMF)
-library(rbenchmark)
-library(bench)
-
-curve(learning_rate(x,1,0.9),0,100)
-curve(learning_rate(x,1,0.99),add=TRUE)
-curve(learning_rate(x,1,0.55),add=TRUE)
 
 set_data <- function(L, nrow, ncol, center=0, scale=1){
   Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)
@@ -16,13 +10,33 @@ set_data <- function(L, nrow, ncol, center=0, scale=1){
   list(Y=Y,Z=Z,W=t(W))
 }
 
-set.seed(1111); dat <- set_data(2, 100, 100)
+set.seed(1111); dat <- set_data(2, 200, 200)
 
+
+indna <- sample.int(length(dat$Y), size = 10)
+Y <- dat$Y
+Y[indna] <- NA
 #mean(dat$Y==0)
-Y <- as(dat$Y, "TsparseMatrix")
+Y <- as(Y, "TsparseMatrix")
 hist(dat$Y, breaks = "FD")
 
-N1 <- length(Y@x)
+
+system.time({
+  out <- vb_nmf_pois(Y, rank=2, iter=100, prior_rate=1)
+})
+
+
+plot(out$logprob)
+
+Zhat <- basemean(out)
+What <- coefmean(out)
+
+fit <- (Zhat%*%What)
+
+basecol <-rgb(0,0,0,0.1)
+plot(dat$Y[-indna], fit[-indna], col=basecol, cex=0.5)
+points(dat$Y[indna], fit[indna], col=rgb(1,0.5,0,0.5), pch=16)
+abline(0,1, col="royalblue")
 
 system.time({
   out <- vb_nmf_pois(Y, rank=2, iter=10, prior_rate=0.1)
@@ -33,9 +47,10 @@ system.time({
 })
 
 system.time({
-out_s <- svb_nmf_pois(Y, rank=2, b_size = 10, forgetting = 0.8, delay = 2)
+out_s <- svb_nmf_pois(Y, rank=2, b_size = 100, forgetting = 0.9, delay = 1.5, n_epochs = 100)
 })
 
+plot(out_s$logprob)
 Zhat <- basemean(out)
 What <- coefmean(out)
 

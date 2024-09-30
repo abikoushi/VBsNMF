@@ -95,11 +95,75 @@ List doVB_pois(const arma::vec & y,
                       Named("logprob")=lp);
 }
 
+////
+//with NA
+////
+//rate parameters
+double up_B_na(const arma::mat & alpha_z,
+            const arma::mat & alpha_w,
+            arma::mat & beta_z,
+            arma::mat & beta_w,
+            arma::mat & Z,
+            arma::mat & W,
+            const arma::uvec & rowi,
+            const arma::uvec & coli,
+            const arma::vec & wrow,
+            const arma::vec & wcol,
+            const double & b){
+  int L = Z.n_cols;
+  double lp = 0;
+  beta_z.fill(b);
+  beta_w.fill(b);
+  //Rprintf("b\n");
+  for(int l=0; l<L; l++){
+    //col W
+    double B1 = sum(wrow%Z.col(l)); 
+    lp -= B1;
+    beta_w.col(l) += B1;
+    W.col(l) = alpha_w.col(l)/beta_w(l);
+    //row z
+    double B2 =sum(wcol%W.col(l));
+    lp -= B2;
+    beta_z.col(l) += B2;
+    Z.col(l) = alpha_z.col(l)/beta_z(l);
+  }
+  return lp;
+}
 
-//
+// [[Rcpp::export]]
+List doVB_pois_na(const arma::vec & y,
+               const arma::uvec & rowi,
+               const arma::uvec & coli,
+               const int & L,
+               const int & iter,
+               const double & a,
+               const double & b,
+               const arma::vec & wrow,
+               const arma::vec & wcol,
+               arma::mat alpha_z, arma::rowvec beta_z,
+               arma::mat alpha_w, arma::rowvec beta_w){
+  arma::mat Z = rand_init(alpha_z, beta_z);
+  arma::mat W = rand_init(alpha_w, beta_w);
+  arma::mat logZ = log(Z);
+  arma::mat logW = log(W);
+  arma::vec lp = arma::zeros<arma::vec>(iter);
+  for (int i=0; i<iter; i++) {
+    double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
+    double lp_b = up_B_na(alpha_z, alpha_w, beta_z, beta_w, Z, W, rowi, coli, wrow, wcol, b);
+    lp(i) = lp_a+lp_b+kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
+    logZ = mat_digamma(alpha_z).each_row() - log(beta_z);
+    logW = mat_digamma(alpha_w).each_row() - log(beta_w);
+  }
+  return List::create(Named("shape_row")=alpha_z,
+                      Named("rate_row")=beta_z,
+                      Named("shape_col")=alpha_w,
+                      Named("rate_col")=beta_w,
+                      Named("logprob")=lp);
+}
+
+////
 //s : stochastic mini-batch
-//
-
+////
 //shape parameters
 double up_A_s(arma::mat & alpha_z,
             arma::mat & alpha_w,
@@ -192,7 +256,7 @@ List doVB_pois_s(const arma::vec & y,
   arma::mat W = rand_init(alpha_w, beta_w);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
-  double weight = (ns/N1);
+  const double weight = (ns/N1);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A_s(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, uid_r, uid_c, a);
