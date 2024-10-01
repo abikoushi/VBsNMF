@@ -1,6 +1,5 @@
-\name{vb_nmf_pois, svb_nmf_pois}
+\name{vb_nmf_pois}
 \alias{vb_nmf_pois}
-\alias{svb_nmf_pois}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Variational Bayes method for sparase nonegative matrix facttorization
@@ -13,54 +12,66 @@ vb_nmf_pois(Y, rank,
             iter=100,
             prior_shape=0.5,
             prior_rate=1e-5)
-
-            
-svb_nmf_pois(Y, rank,
-            b_size = 100,
-            subiter = 10,
-            n_epochs = 10,
-            delay=1,
-            forgetting=0.9,
-            prior_shape=0.5,
-            prior_rate=0.1)
 }
 \arguments{
   \item{Y}{
-  input matix
+  input data matrix to decompose
 }
   \item{rank}{
   rank of the output matices
 }
-  \item{rank}{
-  rank of the output matices
+  \item{iter}{
+  the number of the iterations
+}
+  \item{prior_shape}{
+  shape paremeter of the gamma prior distribution
+}
+  \item{prior_rate}{
+  rate paremeter of the gamma prior distribution
 }
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  \item{shape_row }{shape parameters of the posterir gamma distribution for row-axis}
+  \item{rate_row }{rate parameters of the posterir gamma distribution for row-axis}
+  \item{shape_col }{shape parameters of the posterir gamma distribution for col-axis}
+  \item{rate_col }{rate parameters of the posterir gamma distribution for col-axis}
+  \item{logprob }{lower bound of the log-joint probability}
 }
 \references{
 Cemgil, A. T. (2009). Bayesian inference for nonnegative matrix factorisation models. Computational intelligence and neuroscience, 2009(1), 785152.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or standard data sets, see data().
-
-## The function is currently defined as
-function (x) 
-{
-  }
+#draw random matrix
+set_data <- function(L, nrow, ncol, center=0, scale=1){
+  Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)
+  Z <- sweep(Z,1,rowMeans(Z)-center)
+  W <- matrix(rnorm(L*ncol,0,scale), L, ncol)
+  W <- sweep(W,1,rowMeans(W)-center)
+  Y <- matrix(rpois(nrow*ncol, exp(Z)%*%exp(W)), nrow, ncol)
+  list(Y=Y,Z=Z,W=t(W))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory (show via RShowDoc("KEYWORDS")):
-% \keyword{ ~kwd1 }
-% \keyword{ ~kwd2 }
-% Use only one keyword per line.
-% For non-standard keywords, use \concept instead of \keyword:
-% \concept{ ~cpt1 }
-% \concept{ ~cpt2 }
-% Use only one concept per line.
+
+set.seed(1234); dat <- set_data(2, 99, 205)
+indna <- sample.int(length(dat$Y), size = 100)
+Y <- dat$Y
+Y[indna] <- NA
+
+Y <- as(Y, "TsparseMatrix")
+hist(dat$Y, breaks = "FD")
+
+system.time({
+  out <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+})
+
+plot(out$logprob)
+
+Zhat <- basemean(out)
+What <- coefmean(out)
+
+fit <- Zhat\%*\%What
+
+basecol <-rgb(0,0,0,0.1)
+plot(dat$Y[-indna], fit[-indna], col=basecol, cex=0.5)
+points(dat$Y[indna], fit[indna], col=rgb(1,0.5,0,0.3), pch=16)
+abline(0,1, col="lightgrey", lty=2)
+}

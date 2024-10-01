@@ -1,4 +1,6 @@
+library(Matrix)
 library(NMF)
+library(RcppML)
 library(VBsNMF)
 
 set_data <- function(L, nrow, ncol, center=0, scale=1){
@@ -11,32 +13,37 @@ set_data <- function(L, nrow, ncol, center=0, scale=1){
 }
 
 set.seed(1111); dat <- set_data(2, 200, 200)
+system.time({
+model <- RcppML::nmf(dat$Y, k = 2, maxit = 100, tol=0)
+})
 
+system.time({
+  out <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+})
 
-indna <- sample.int(length(dat$Y), size = 10)
+set.seed(1234); dat <- set_data(2, 99, 205)
+indna <- sample.int(length(dat$Y), size = 100)
 Y <- dat$Y
 Y[indna] <- NA
 #mean(dat$Y==0)
 Y <- as(Y, "TsparseMatrix")
 hist(dat$Y, breaks = "FD")
 
-
 system.time({
-  out <- vb_nmf_pois(Y, rank=2, iter=100, prior_rate=1)
+  out <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
 })
-
 
 plot(out$logprob)
 
 Zhat <- basemean(out)
 What <- coefmean(out)
 
-fit <- (Zhat%*%What)
+fit <- Zhat%*%What
 
 basecol <-rgb(0,0,0,0.1)
 plot(dat$Y[-indna], fit[-indna], col=basecol, cex=0.5)
-points(dat$Y[indna], fit[indna], col=rgb(1,0.5,0,0.5), pch=16)
-abline(0,1, col="royalblue")
+points(dat$Y[indna], fit[indna], col=rgb(1,0.5,0,0.3), pch=16)
+abline(0,1, col="lightgrey", lty=2)
 
 system.time({
   out <- vb_nmf_pois(Y, rank=2, iter=10, prior_rate=0.1)
