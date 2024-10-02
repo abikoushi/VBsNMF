@@ -66,17 +66,19 @@ double up_B(const arma::mat & alpha_z,
 List doVB_pois(const arma::vec & y,
                const arma::uvec & rowi,
                const arma::uvec & coli,
+               const int & Nr, const int & Nc, 
                const int & L,
                const int & iter,
                const double & a,
-               const double & b,
-               arma::mat alpha_z, arma::rowvec beta_z,
-               arma::mat alpha_w, arma::rowvec beta_w){
-  arma::mat Z = rand_init(alpha_z, beta_z);
-  arma::mat W = rand_init(alpha_w, beta_w);
+               const double & b){
+  arma::mat Z = arma::randg<arma::mat>(Nr, L, arma::distr_param(a,1/b));
+  arma::mat W = arma::randg<arma::mat>(Nc, L, arma::distr_param(a,1/b));
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
-  //arma::mat lp zeros(iter);
+  arma::mat alpha_z = arma::ones<arma::mat>(Nr, L);
+  arma::rowvec beta_z = arma::ones<arma::rowvec>(L);
+  arma::mat alpha_w = arma::ones<arma::mat>(Nc, L);
+  arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
@@ -134,18 +136,21 @@ double up_B_na(const arma::mat & alpha_z,
 List doVB_pois_na(const arma::vec & y,
                const arma::uvec & rowi,
                const arma::uvec & coli,
+               const int & Nr, const int & Nc,
                const int & L,
                const int & iter,
                const double & a,
                const double & b,
                const arma::vec & wrow,
-               const arma::vec & wcol,
-               arma::mat alpha_z, arma::rowvec beta_z,
-               arma::mat alpha_w, arma::rowvec beta_w){
-  arma::mat Z = rand_init(alpha_z, beta_z);
-  arma::mat W = rand_init(alpha_w, beta_w);
+               const arma::vec & wcol){
+  arma::mat Z = arma::randg<arma::mat>(Nr, L);
+  arma::mat W = arma::randg<arma::mat>(Nc, L);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
+  arma::mat alpha_z = arma::ones<arma::mat>(Nr, L);
+  arma::rowvec beta_z = arma::ones<arma::rowvec>(L);
+  arma::mat alpha_w = arma::ones<arma::mat>(Nc, L);
+  arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
@@ -247,8 +252,10 @@ List doVB_pois_s(const arma::vec & y,
                  const double & a,
                  const double & b,
                  const double & N1, 
-                 arma::mat alpha_z, arma::rowvec beta_z,
-                 arma::mat alpha_w, arma::rowvec beta_w){
+                 arma::mat alpha_z, 
+                 arma::rowvec beta_z,
+                 arma::mat alpha_w, 
+                 arma::rowvec beta_w){
   const double ns = y.n_rows;
   const arma::uvec uid_r = unique(rowi); //for a
   const arma::uvec uid_c = unique(coli); //for a
