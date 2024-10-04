@@ -4,6 +4,33 @@ using namespace Rcpp;
 #include "KLgamma.h"
 #include "rand.h"
 
+void up_log_gamma(arma::mat & logv, const arma::vec & a, const double & logb, const int & l){
+  int K = logv.n_rows;
+  for(int k=0;k<K;k++){
+    logv(k,l) = R::digamma(a(k)) - logb;
+  }
+}
+
+double kld(const arma::mat & alpha_z,
+           const arma::mat & beta_z,
+           const arma::mat & alpha_w,
+           const arma::mat & beta_w,
+           const double & a,
+           const double & b){
+  double lp = 0;
+  for(int i=0; i<alpha_z.n_rows; i++){
+    for(int l=0; l<alpha_z.n_cols; l++){
+      lp += kl2gamma(a, b, alpha_z(i,l), beta_z(l));
+    }
+  }
+  for(int i=0; i<alpha_w.n_rows; i++){
+    for(int l=0; l<alpha_w.n_cols; l++){
+      lp += kl2gamma(a, b, alpha_w(i,l), beta_w(l));
+    }
+  }
+  return lp;
+}
+
 //shape parameters
 double up_A(arma::mat & alpha_z,
             arma::mat & alpha_w,
@@ -23,10 +50,10 @@ double up_A(arma::mat & alpha_z,
   for(int n=0; n<y.n_rows; n++){
     arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
     double R = sum(r);
-    lp +=  y(n)*log(R) - lgamma(y(n)+1);
-    r *= y(n)/R;
+    r = y(n)*(r/R);
     alpha_z.row(rowi(n)) += r;
     alpha_w.row(coli(n)) += r;
+    lp +=  y(n)*log(R);// - lgamma(y(n)+1);
   }
   return lp;
 }
@@ -38,6 +65,8 @@ double up_B(const arma::mat & alpha_z,
           arma::mat & beta_w,
           arma::mat & Z,
           arma::mat & W,
+          arma::mat & logZ,
+          arma::mat & logW,
           const arma::uvec & rowi,
           const arma::uvec & coli,
           const double & b){
@@ -52,11 +81,15 @@ double up_B(const arma::mat & alpha_z,
     lp -= B1;
     beta_w.col(l) += B1;
     W.col(l) = alpha_w.col(l)/beta_w(l);
+    //logW.col(l) = vec_digamma(alpha_w.col(l)) - log(beta_w(l));
+    up_log_gamma(logW, alpha_w.col(l), log(beta_w(l)), l);
     //row z
     double B2 = sum(W.col(l));
     lp -= B2;
     beta_z.col(l) += B2;
     Z.col(l) = alpha_z.col(l)/beta_z(l);
+    //logZ.col(l) = vec_digamma(alpha_z.col(l)) - log(beta_z(l));
+    up_log_gamma(logZ, alpha_z.col(l), log(beta_z(l)), l);
   }
   return lp;
 }
@@ -71,8 +104,10 @@ List doVB_pois(const arma::vec & y,
                const int & iter,
                const double & a,
                const double & b){
-  arma::mat Z = arma::randg<arma::mat>(Nr, L, arma::distr_param(a,1/b));
-  arma::mat W = arma::randg<arma::mat>(Nc, L, arma::distr_param(a,1/b));
+  //arma::mat Z = arma::randg<arma::mat>(Nr, L, arma::distr_param(a,1.0/b));
+  //arma::mat W = arma::randg<arma::mat>(Nc, L, arma::distr_param(a,1.0/b));
+  arma::mat Z = arma::randg<arma::mat>(Nr, L);
+  arma::mat W = arma::randg<arma::mat>(Nc, L);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
   arma::mat alpha_z = arma::ones<arma::mat>(Nr, L);
@@ -82,14 +117,10 @@ List doVB_pois(const arma::vec & y,
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
     double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
-    double lp_b = up_B(alpha_z, alpha_w, beta_z, beta_w, Z, W, rowi, coli, b);
-    //lp.col(0).row(i) = lp_a ;
-    //lp.col(1).row(i) = lp_b;
-    //lp.col(2).row(i) = kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
+    double lp_b = up_B(alpha_z, alpha_w, beta_z, beta_w, Z, W, logZ, logW, rowi, coli, b);
     lp(i) = lp_a+lp_b+kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
-    logZ = mat_digamma(alpha_z).each_row() - log(beta_z);
-    logW = mat_digamma(alpha_w).each_row() - log(beta_w);
   }
+  lp -= sum(lgamma(y+1)); 
   return List::create(Named("shape_row")=alpha_z,
                       Named("rate_row")=beta_z,
                       Named("shape_col")=alpha_w,
@@ -191,7 +222,8 @@ double up_A_s(arma::mat & alpha_z,
     arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
     double R = sum(r);
     lp +=  y(n)*log(R) - lgamma(y(n)+1);
-    r *= y(n)/R;
+    r /= R;
+    r *= y(n);
     alpha_z.row(rowi(n)) += r;
     alpha_w.row(coli(n)) += r;
   }

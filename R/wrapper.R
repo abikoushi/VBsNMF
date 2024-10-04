@@ -1,5 +1,4 @@
-vb_nmf_pois <- function(Y, rank, iter=100, 
-         prior_shape=0.5, prior_rate=1e-5){
+vb_nmf_pois <- function(Y, rank, iter=100, prior_shape=1, prior_rate=1){
   if(!any(class(Y)=="dgTMatrix")){
     Y <- as(Y, "TsparseMatrix")
   }

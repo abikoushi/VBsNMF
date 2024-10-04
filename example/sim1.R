@@ -47,7 +47,7 @@ Y <- dat$Y
 Y[indna] <- NA
 
 system.time({
-  out <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=0.01)
+  out <- vb_nmf_pois(dat$Y, rank=2, iter=1000, prior_rate=1)
 })
 plot(out$logprob)
 Zhat <- basemean(out)
@@ -59,19 +59,23 @@ basecol <-rgb(0,0,0,0.1)
 plot(dat$Y[-indna], fit[-indna], col=basecol, cex=0.5)
 points(dat$Y[indna], fit[indna], col=rgb(1,0.5,0,0.3), pch=16)
 abline(0,1, col="lightgrey", lty=2)
+####
 
+# set.seed(1234);
+# dat <- rsparsematrix(1000,1000,0.9,
+#                      rand.x = function(n){rpois(n,10)+1})
+
+set.seed(1); dat <- set_data(2, 100, 100)
 system.time({
-  out <- VBsNMF:::vb_nmf_pois(dat$Y, rank=2, iter=100)
+  out <- VBsNMF::vb_nmf_pois(dat$Y, rank=2,
+                             prior_shape=1, prior_rate=1, iter=1000)
 })
 
+plot(out$logprob)
 system.time({
-  out2 <- NMF::nmf(dat$Y, rank=2, maxIter=100, eps=0)
+  out2 <- NMF::nmf(dat$Y, rank=2, maxIter=1000, eps=-1)
 })
 
-
-
-
-plot(out_s$logprob)
 Zhat <- basemean(out)
 What <- coefmean(out)
 
