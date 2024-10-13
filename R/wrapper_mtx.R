@@ -7,7 +7,7 @@ svb_nmf_pois_mtx <- function(file_path, rank,
                         subiter = 10,
                         n_epochs = 10,
                         delay=1, forgetting=0.9,
-                        prior_shape=0.5, prior_rate=0.1){
+                        prior_shape=1, prior_rate=1){
   #get matrix size
   con <- file(file_path, open = "r") #Open for reading in text mode
   rowsize <- scan(con, what=integer(), comment.char = "%", nmax=1,  quiet = TRUE)

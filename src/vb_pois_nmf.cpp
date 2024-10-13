@@ -53,7 +53,7 @@ double up_A(arma::mat & alpha_z,
     r = y(n)*(r/R);
     alpha_z.row(rowi(n)) += r;
     alpha_w.row(coli(n)) += r;
-    lp +=  y(n)*log(R);// - lgamma(y(n)+1);
+    lp +=  y(n)*log(R);
   }
   return lp;
 }
@@ -104,8 +104,6 @@ List doVB_pois(const arma::vec & y,
                const int & iter,
                const double & a,
                const double & b){
-  //arma::mat Z = arma::randg<arma::mat>(Nr, L, arma::distr_param(a,1.0/b));
-  //arma::mat W = arma::randg<arma::mat>(Nc, L, arma::distr_param(a,1.0/b));
   arma::mat Z = arma::randg<arma::mat>(Nr, L);
   arma::mat W = arma::randg<arma::mat>(Nc, L);
   arma::mat logZ = log(Z);
