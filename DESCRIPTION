@@ -1,6 +1,6 @@
 Package: VBsNMF
 Type: Package
-Title: Variational Bayes method for sparase nonegative matrix facttorization
+Title: Variational Bayes method for sparase nonegative matrix factorization
 Version: 0.1
 Author: Ko Abe
 Maintainer: Ko Abe <abe.csb@tmd.ac.jp>

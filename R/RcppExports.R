@@ -13,7 +13,3 @@ doVB_pois_s <- function(y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha
     .Call(`_VBsNMF_doVB_pois_s`, y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha_w, beta_w)
 }
 
-doVB_norm <- function(y, rowi, coli, Nr, Nc, L, iter, prior_prec, a, b) {
-    .Call(`_VBsNMF_doVB_norm`, y, rowi, coli, Nr, Nc, L, iter, prior_prec, a, b)
-}
-
