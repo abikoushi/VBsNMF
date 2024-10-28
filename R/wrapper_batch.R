@@ -40,3 +40,17 @@ coefmean <- function(obj){
   stopifnot(any(class(obj)=="nmf_pois_posterior"))
   t(with(obj, sweep(shape_col, 2, c(rate_col),"/")))
 }
+
+###
+
+em_nmf_pois <- function(Y, rank, iter=100, prior_shape=1, prior_rate=1){
+  if(!any(class(Y)=="dgTMatrix")){
+    Y <- as(Y, "TsparseMatrix")
+  }
+  out <- doEM_pois(y = Y@x, rowi = Y@i, coli = Y@j,
+                     Y@Dim[1], Y@Dim[2],
+                     L = rank, iter=iter,
+                     a = prior_shape, b = prior_rate)
+
+  return(out)
+}

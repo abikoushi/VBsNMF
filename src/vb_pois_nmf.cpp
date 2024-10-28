@@ -34,8 +34,6 @@ double kld(const arma::mat & alpha_z,
 //shape parameters
 double up_A(arma::mat & alpha_z,
             arma::mat & alpha_w,
-            arma::mat & beta_z,
-            arma::mat & beta_w,
             const arma::mat & logZ,
             const arma::mat & logW,
             const arma::vec & y,
@@ -114,7 +112,7 @@ List doVB_pois(const arma::vec & y,
   arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
-    double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
+    double lp_a = up_A(alpha_z, alpha_w, logZ, logW, y, rowi, coli, a);
     double lp_b = up_B(alpha_z, alpha_w, beta_z, beta_w, Z, W, logZ, logW, rowi, coli, b);
     lp(i) = lp_a+lp_b+kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
   }
@@ -182,7 +180,7 @@ List doVB_pois_na(const arma::vec & y,
   arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
-    double lp_a = up_A(alpha_z, alpha_w, beta_z, beta_w, logZ, logW, y, rowi, coli, a);
+    double lp_a = up_A(alpha_z, alpha_w, logZ, logW, y, rowi, coli, a);
     double lp_b = up_B_na(alpha_z, alpha_w, beta_z, beta_w, Z, W, rowi, coli, wrow, wcol, b);
     lp(i) = lp_a+lp_b+kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
     logZ = mat_digamma(alpha_z).each_row() - log(beta_z);

@@ -13,9 +13,19 @@ set_data <- function(L, nrow, ncol, center=0, scale=1){
 }
 
 #####
+set.seed(1); dat <- set_data(2, 100, 100)
 system.time({
-  out <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+  out_vb <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
 })
+plot(out_vb$logprob, type="l")
+
+system.time({
+  out_em <- em_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+})
+plot(out_em$logprob, type="l")
+
+sqrt(mean((dat$Y-basemean(out_vb)%*%coefmean(out_vb))^2))
+sqrt(mean((dat$Y-out_em$Z%*%t(out_em$W))^2))
 
 system.time({
   model <- RcppML::nmf(dat$Y, k = 2, maxit = 100, tol=0)
