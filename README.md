@@ -4,3 +4,8 @@ R package `VBsNMF` provides an efficient implementation enjoying the sparsity of
 
 (under preparation)
 
+How to install:
+
+```r
+devtools::install_github("abikoushi/VBsNMF")
+```

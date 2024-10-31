@@ -3,9 +3,9 @@ learning_rate <- function(t, delay=1, forgetting=0.9){
 }
 
 svb_nmf_pois_mtx <- function(file_path, rank,
-                        b_size = 100,
-                        subiter = 10,
-                        n_epochs = 10,
+                        subiter = 5,
+                        n_epochs = 100,
+                        b_size = 10000,
                         delay=1, forgetting=0.9,
                         prior_shape=1, prior_rate=1){
   #get matrix size
