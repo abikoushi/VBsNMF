@@ -14,7 +14,7 @@ svb_nmf_pois_mtx <- function(file_path, rank,
   colsize <- scan(con, what=integer(), nmax=1, quiet = TRUE)
   N1 <- scan(con, what=integer(), nmax=1, quiet = TRUE)
   close(con)
-  
+  b_size <- min(b_size, N1)
   a <- prior_shape
   b <- prior_rate
   alpha_z = matrix(a, rowsize, rank)
@@ -22,13 +22,20 @@ svb_nmf_pois_mtx <- function(file_path, rank,
   alpha_w = matrix(a, colsize, rank)
   beta_w = matrix(b, 1, rank)
   rind <-sample.int(N1)
-  sb <- floor(N1/b_size)
-  m_sb <-b_size*sb
-  subind <- vector("list",sb+1)
-  for(i in 1:sb){
-    subind[[i]] <- rind[1:b_size+b_size*(i-1)]  
+  if(N1%%b_size==0){
+    sb <- floor(N1/b_size)
+    subind <- vector("list",sb)
+    for(i in 1:sb){
+      subind[[i]] <- rind[1:b_size+b_size*(i-1)]  
+    }
+  }else{
+    sb <- floor(N1/b_size)
+    subind <- vector("list",sb+1)
+    for(i in 1:sb){
+      subind[[i]] <- rind[1:b_size+b_size*(i-1)]  
+    }
+    subind[[sb+1]] <- rind[(b_size*sb):length(rind)] 
   }
-  subind[[sb+1]] <- rind[(b_size*sb):length(rind)]
   lp <- numeric(n_epochs)
   pb <- txtProgressBar(0, n_epochs, style = 3)
   for(ep in 1:n_epochs){
