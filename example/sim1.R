@@ -16,9 +16,9 @@ set_data <- function(L, nrow, ncol, center=0, scale=1){
 #VB vs. EM
 set.seed(1); dat <- set_data(2, 100, 100)
 system.time({
-  out_vb <- vb_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+  out_vb <- VBNMF(dat$Y, rank=2, iter=250, prior_rate=1)
 })
-plot(out_vb$logprob, type="l")
+plot(out_vb$logprob[-1], type="l")
 
 system.time({
   out_em <- em_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)

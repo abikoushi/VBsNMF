@@ -1,4 +1,4 @@
-vb_nmf_pois <- function(Y, rank, iter=100,
+VBNMF <- function(Y, rank, iter=100,
                         prior_shape=1, prior_rate=1){
   if(!any(class(Y)=="dgTMatrix")){
     Y <- as(Y, "TsparseMatrix")
@@ -33,18 +33,18 @@ vb_nmf_pois <- function(Y, rank, iter=100,
 }
 
 basemean <- function(obj){
-  stopifnot(any(class(obj)=="nmf_pois_posterior"))
+  #stopifnot(any(class(obj)=="nmf_pois_posterior"))
   with(obj, sweep(shape_row, 2, c(rate_row),"/"))
 } 
 
 coefmean <- function(obj){
-  stopifnot(any(class(obj)=="nmf_pois_posterior"))
+  #stopifnot(any(class(obj)=="nmf_pois_posterior"))
   t(with(obj, sweep(shape_col, 2, c(rate_col),"/")))
 }
 
 ###
 
-em_nmf_pois <- function(Y, rank, iter=100, prior_shape=1, prior_rate=1){
+EMNMF <- function(Y, rank, iter=100, prior_shape=1, prior_rate=1){
   if(!any(class(Y)=="dgTMatrix")){
     Y <- as(Y, "TsparseMatrix")
   }

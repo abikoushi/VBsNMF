@@ -3,7 +3,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 
-arma::mat rand_init(const arma::mat & alpha, const arma::rowvec & beta){
+arma::mat randinit_gamma(const arma::mat & alpha, const arma::rowvec & beta){
   arma::mat Z = alpha;
   for (int i=0; i<alpha.n_rows; i++) {
     for (int j=0; j<alpha.n_cols; j++) {
