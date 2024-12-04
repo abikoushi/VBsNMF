@@ -74,7 +74,7 @@ double up_Aw(arma::mat & alpha_w,
   return lp;
 }
 
-
+/*
 //rate parameters
 double up_B(const arma::mat & alpha_z,
           const arma::mat & alpha_w,
@@ -108,6 +108,7 @@ double up_B(const arma::mat & alpha_z,
   }
   return lp;
 }
+*/
 
 double up_Bz(const arma::mat & alpha_z,
              arma::mat & beta_z,
@@ -122,7 +123,6 @@ double up_Bz(const arma::mat & alpha_z,
   beta_z.fill(b);
   //Rprintf("b\n");
   for(int l=0; l<L; l++){
-    //row z
     double B2 = sum(W.col(l));
     lp -= B2;
     beta_z.col(l) += B2;
@@ -144,7 +144,6 @@ double up_Bw(const arma::mat & alpha_w,
   double lp = 0;
   beta_w.fill(b);
   for(int l=0; l<L; l++){
-    //col W
     double B1 = sum(Z.col(l)); 
     lp -= B1;
     beta_w.col(l) += B1;
@@ -308,6 +307,7 @@ List doVB_pois_na(const arma::vec & y,
 //s : stochastic mini-batch
 ////
 //shape parameters
+/*
 double up_A_s(arma::mat & alpha_z,
             arma::mat & alpha_w,
             arma::mat & beta_z,
@@ -336,45 +336,15 @@ double up_A_s(arma::mat & alpha_z,
   }
   return lp;
 }
+*/
 
+/*
 double NegativeSampling(const arma::vec & v){
   //future work sum(weight%v);
   double out = sum(v);
   return out;
 }
-
-//rate parameters
-double up_B_s(const arma::mat alpha_z,
-              const arma::mat alpha_w,
-              arma::mat & beta_z,
-              arma::mat & beta_w,
-              arma::mat & Z,
-              arma::mat & W,
-              const double & weight, 
-              const arma::uvec & rowi,
-              const arma::uvec & coli,
-              const double & b){
-  int L = Z.n_cols;
-  double lp = 0;
-  beta_z.fill(b);
-  beta_w.fill(b);
-  for(int l=0; l<L; l++){
-    //col W
-    double B1=0;
-    B1 += weight*NegativeSampling(Z.col(l));
-    lp -= B1;
-    beta_w.col(l) += B1;
-    W.col(l) = alpha_w.col(l)/beta_w(l);
-    //row z
-    double B2=0;
-    B2 += weight*NegativeSampling(W.col(l));
-    lp -= B2;
-    beta_z.col(l) += B2;
-    Z.col(l) = alpha_z.col(l)/beta_z(l);
-  }
-  return lp;
-}
-
+*/
 
 double up_Az_s(arma::mat & alpha_z,
                const arma::mat & logZ,
@@ -382,19 +352,21 @@ double up_Az_s(arma::mat & alpha_z,
                const arma::vec & y,
                const arma::uvec & rowi,
                const arma::uvec & coli,
-               const arma::uvec & uid_r,
                const double & a){
   //initialize by hyper parameter
-  alpha_z.rows(uid_r).fill(a);
+  //alpha_z.rows(uid_r).fill(a);
+  alpha_z.fill(a);
   double lp = 0;
   //inclement sufficient statistics
   for(int n=0; n<y.n_rows; n++){
-    arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
+    int rn = rowi(n);
+    int cn = coli(n);
+    arma::rowvec r = exp(logZ.row(rn) + logW.row(cn));
     double R = sum(r);
     lp +=  y(n)*log(R) - lgamma(y(n)+1);
     r /= R;
     r *= y(n);
-    alpha_z.row(rowi(n)) += r;
+    alpha_z.row(rn) += r;
   }
   return lp;
 }
@@ -405,19 +377,21 @@ double up_Aw_s(arma::mat & alpha_w,
                const arma::vec & y,
                const arma::uvec & rowi,
                const arma::uvec & coli,
-               const arma::uvec & uid_c,
                const double & a){
   //initialize by hyper parameter
-  alpha_w.rows(uid_c).fill(a);
+  //alpha_w.rows(uid_c).fill(a);
+  alpha_w.fill(a);
   double lp = 0;
   //inclement sufficient statistics
   for(int n=0; n<y.n_rows; n++){
-    arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
+    int rn = rowi(n);
+    int cn = coli(n);
+    arma::rowvec r = exp(logZ.row(rn) + logW.row(cn));
     double R = sum(r);
     lp +=  y(n)*log(R) - lgamma(y(n)+1);
     r /= R;
     r *= y(n);
-    alpha_w.row(coli(n)) += r;
+    alpha_w.row(cn) += r;
   }
   return lp;
 }
@@ -426,6 +400,7 @@ double up_Bz_s(const arma::mat alpha_z,
                arma::mat & beta_z,
                arma::mat & Z,
                arma::mat & W,
+               const arma::rowvec & SW,
                const double & weight, 
                const double & b){
   int L = Z.n_cols;
@@ -433,7 +408,7 @@ double up_Bz_s(const arma::mat alpha_z,
   beta_z.fill(b);
   for(int l=0; l<L; l++){
     double B2=0;
-    B2 += weight*NegativeSampling(W.col(l));
+    B2 += SW(l) +  weight*sum(W.col(l));
     lp -= B2;
     beta_z.col(l) += B2;
     Z.col(l) = alpha_z.col(l)/beta_z(l);
@@ -445,15 +420,15 @@ double up_Bw_s(const arma::mat alpha_w,
                arma::mat & beta_w,
                arma::mat & Z,
                arma::mat & W,
+               const arma::rowvec & SZ,
                const double & weight, 
                const double & b){
   int L = Z.n_cols;
   double lp = 0;
   beta_w.fill(b);
   for(int l=0; l<L; l++){
-    //col W
     double B1=0;
-    B1 += weight*NegativeSampling(Z.col(l));
+    B1 += SZ(l) + weight*(sum(Z.col(l)));
     lp -= B1;
     beta_w.col(l) += B1;
     W.col(l) = alpha_w.col(l)/beta_w(l);
@@ -469,21 +444,21 @@ double up_theta_s(arma::mat & alpha_z,
                   arma::mat & W,
                   arma::mat & logZ,
                   arma::mat & logW,
+                  const arma::rowvec & SZ,
+                  const arma::rowvec & SW,
                   const arma::vec & y,
                   const arma::uvec & rowi,
                   const arma::uvec & coli,
-                  const arma::uvec & uid_r,
-                  const arma::uvec & uid_c,
                   const double & a,
                   const double & b,
                   const double & weight){
   int L = Z.n_cols;
   double lp = 0;
-  up_Az_s(alpha_z, logZ, logW, y, rowi,coli,uid_r,a);
-  up_Bz_s(alpha_z, beta_z, Z, W, weight, b);
+  up_Az_s(alpha_z, logZ, logW, y, rowi, coli, a);
+  up_Bz_s(alpha_z, beta_z, Z, W, SW, weight, b);
   logZ = mat_digamma(alpha_z).each_row() - log(beta_z);
-  lp += up_Aw_s(alpha_w, logZ, logW, y, rowi, coli, uid_c,a);
-  lp += up_Bw_s(alpha_w, beta_w, Z, W, weight, b);
+  lp += up_Aw_s(alpha_w, logZ, logW, y, rowi, coli, a);
+  lp += up_Bw_s(alpha_w, beta_w, Z, W, SZ, weight, b);
   logW = mat_digamma(alpha_w).each_row() - log(beta_w);
   return lp;
 }
@@ -502,16 +477,18 @@ List doVB_pois_s(const arma::vec & y,
                  arma::mat alpha_w, 
                  arma::rowvec beta_w){
   const double ns = y.n_rows;
-  const arma::uvec uid_r = unique(rowi); //for a
-  const arma::uvec uid_c = unique(coli); //for a
   arma::mat Z = randinit_gamma(alpha_z, beta_z);
   arma::mat W = randinit_gamma(alpha_w, beta_w);
   arma::mat logZ = log(Z);
   arma::mat logW = log(W);
   const double weight = (ns/N1);
+  arma::rowvec SZ = beta_w - weight*sum(Z,0) - b;
+  arma::rowvec SW = beta_z - weight*sum(W,0) - b;
+  SZ.cols(find(SZ<0.0)).fill(0.0);
+  SW.cols(find(SW<0.0)).fill(0.0);
   arma::vec lp = arma::zeros<arma::vec>(iter);
   for (int i=0; i<iter; i++) {
-    double lp1 = up_theta_s(alpha_z, alpha_w, beta_z, beta_w, Z, W, logZ, logW, y, rowi, coli, uid_r, uid_c, a, b, weight);
+    double lp1 = up_theta_s(alpha_z, alpha_w, beta_z, beta_w, Z, W, logZ, logW, SZ, SW, y, rowi, coli, a, b, weight);
     lp(i) = lp1 + kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
   }
   return List::create(Named("shape_row")=alpha_z,
@@ -522,5 +499,6 @@ List doVB_pois_s(const arma::vec & y,
 }
 
 ////
-//_s_na : stochastic mini-batch with na
+//To Do
+//doVB_pois_s_na : stochastic mini-batch with na
 ////
