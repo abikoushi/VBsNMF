@@ -31,8 +31,6 @@ arma::vec vec_digamma(const arma::vec & a){
   return out;
 }
 
-
-
 double lowerbound_logML_pois(const arma::vec & y,
                              const arma::mat & alpha_z,
                              const arma::mat & beta_z,
@@ -49,5 +47,32 @@ double lowerbound_logML_pois(const arma::vec & y,
   lp -= accu((alpha_z-1)%logZ - Z.each_row()%beta_z + alpha_z.each_row()%log(beta_z) - lgamma(alpha_z));
   lp += sum(sum((a-1)*logW - b*W,0) + a*log(beta_w) - W.n_rows*W.n_elem*std::lgamma(a));
   lp -= accu((alpha_w-1)%logW - W.each_row()%beta_w + alpha_w.each_row()%log(beta_w) - lgamma(alpha_w));
+  return lp;
+}
+
+void up_log_gamma(arma::mat & logv, const arma::vec & a, const double & logb, const int & l){
+  int K = logv.n_rows;
+  for(int k=0;k<K;k++){
+    logv(k,l) = R::digamma(a(k)) - logb;
+  }
+}
+
+double kld(const arma::mat & alpha_z,
+           const arma::mat & beta_z,
+           const arma::mat & alpha_w,
+           const arma::mat & beta_w,
+           const double & a,
+           const double & b){
+  double lp = 0;
+  for(int i=0; i<alpha_z.n_rows; i++){
+    for(int l=0; l<alpha_z.n_cols; l++){
+      lp += kl2gamma(a, b, alpha_z(i,l), beta_z(l));
+    }
+  }
+  for(int i=0; i<alpha_w.n_rows; i++){
+    for(int l=0; l<alpha_w.n_cols; l++){
+      lp += kl2gamma(a, b, alpha_w(i,l), beta_w(l));
+    }
+  }
   return lp;
 }

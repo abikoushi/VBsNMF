@@ -8,10 +8,17 @@ scan1_mtx <- function(con, skip = 0){
              skip = skip, comment.char = "%")
 }
 
+scan1_csv <- function(con, skip = 0, nlines=1){
+  base::scan(con, quiet=TRUE, 
+             what = numeric(),
+             nlines = nlines,
+             skip = skip, comment.char = "%", sep = ",")
+}
+
 size_mtx <- function(file_path){
   con <- file(file_path, open = "r") #Open for reading in text mode
   #get matrix size
-  rowsize <- scan(con, what=integer(), comment.char = "%", nmax=1,  quiet = TRUE)
+  rowsize <- scan(con, what=integer(), comment.char = "%", nmax=1, quiet = TRUE)
   colsize <- scan(con, what=integer(), nmax=1, quiet = TRUE)
   len <- scan(con, what=integer(), nmax=1, quiet = TRUE)
   close(con)
@@ -36,3 +43,5 @@ dataloader_mtx <- function(file_path, bag){
   close(con)
   return(out)
 }
+
+

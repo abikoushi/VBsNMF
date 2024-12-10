@@ -92,12 +92,33 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// doVB_pois_s_mtx
+List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns);
+RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type file_path(file_pathSEXP);
+    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
+    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
+    Rcpp::traits::input_parameter< const int& >::type subiter(subiterSEXP);
+    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
+    Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const double& >::type N1(N1SEXP);
+    Rcpp::traits::input_parameter< const int& >::type Nr(NrSEXP);
+    Rcpp::traits::input_parameter< const int& >::type Nc(NcSEXP);
+    Rcpp::traits::input_parameter< const int& >::type ns(nsSEXP);
+    rcpp_result_gen = Rcpp::wrap(doVB_pois_s_mtx(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},
     {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 11},
     {"_VBsNMF_doVB_pois_s", (DL_FUNC) &_VBsNMF_doVB_pois_s, 12},
+    {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 10},
     {NULL, NULL, 0}
 };
 

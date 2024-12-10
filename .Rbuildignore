@@ -3,3 +3,4 @@
 ^example$
 ^README.md$
 \.mtx$
+^VBparams$
