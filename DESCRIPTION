@@ -1,10 +1,10 @@
 Package: VBsNMF
 Type: Package
 Title: Variational Bayes method for sparase nonegative matrix factorization
-Version: 0.3.2
+Version: 0.3.3
 Author: Ko Abe
 Maintainer: Ko Abe <abe.csb@tmd.ac.jp>
 Description: Efficient implementation enjoying the sparsity of the Variational Bayes method for nonnegative matrix factorization.
 License: MIT + file LICENSE
 Imports: Rcpp (>= 1.0.13), Matrix (>= 1.7)
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, RcppProgress

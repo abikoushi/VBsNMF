@@ -30,6 +30,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// randpick_c
+arma::umat randpick_c(int N1, int b_size);
+RcppExport SEXP _VBsNMF_randpick_c(SEXP N1SEXP, SEXP b_sizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type N1(N1SEXP);
+    Rcpp::traits::input_parameter< int >::type b_size(b_sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(randpick_c(N1, b_size));
+    return rcpp_result_gen;
+END_RCPP
+}
 // doVB_pois
 List doVB_pois(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& Nr, const int& Nc, const int& L, const int& iter, const double& a, const double& b);
 RcppExport SEXP _VBsNMF_doVB_pois(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP) {
@@ -93,8 +105,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // doVB_pois_s_mtx
-List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns);
-RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP) {
+List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns, const double& delay, const double& forgetting, const bool& display_progress);
+RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP, SEXP delaySEXP, SEXP forgettingSEXP, SEXP display_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -108,17 +120,21 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int& >::type Nr(NrSEXP);
     Rcpp::traits::input_parameter< const int& >::type Nc(NcSEXP);
     Rcpp::traits::input_parameter< const int& >::type ns(nsSEXP);
-    rcpp_result_gen = Rcpp::wrap(doVB_pois_s_mtx(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns));
+    Rcpp::traits::input_parameter< const double& >::type delay(delaySEXP);
+    Rcpp::traits::input_parameter< const double& >::type forgetting(forgettingSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type display_progress(display_progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(doVB_pois_s_mtx(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, delay, forgetting, display_progress));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
+    {"_VBsNMF_randpick_c", (DL_FUNC) &_VBsNMF_randpick_c, 2},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},
     {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 11},
     {"_VBsNMF_doVB_pois_s", (DL_FUNC) &_VBsNMF_doVB_pois_s, 12},
-    {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 10},
+    {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 13},
     {NULL, NULL, 0}
 };
 

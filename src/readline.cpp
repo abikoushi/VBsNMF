@@ -15,8 +15,7 @@ void readmtx(arma::uvec & row_i,
     int x;
     int y;
     double v;
-    //readaline_mtx(x, y, v, readtxt, bag(n)+2);
-    
+
     std::ifstream file(readtxt);
     std::string str;
     
@@ -31,7 +30,7 @@ void readmtx(arma::uvec & row_i,
           getline(ss, substr, ' ');
           svec.push_back(substr);
         }
-        int K = svec.size();
+        //int K = svec.size();
         x = stoi(svec[0]);
         y = stoi(svec[1]);
         v = stod(svec[2]);
@@ -46,4 +45,29 @@ void readmtx(arma::uvec & row_i,
     }
   }
   //return List::create(row_i, col_i, val);
+}
+
+// [[Rcpp::export]]
+arma::umat randpick_c(int N1, int b_size){
+  arma::uvec rind = arma::randperm(N1);
+  int rem =  N1%b_size;
+  int sb = N1/b_size;
+  arma::umat subind;
+  if(rem==0){
+    subind = arma::zeros<arma::umat>(b_size, sb);
+  }else{
+    subind = arma::zeros<arma::umat>(b_size, sb+1);
+  }
+  if(rem==0){
+    for(int i=0; i<sb; i++){
+      subind.col(i) = rind.rows(b_size*i,b_size+b_size*i-1);
+    }
+  }else{
+    for(int i=0; i<sb; i++){
+      subind.col(i) = rind.rows(b_size*i, b_size+b_size*i-1);
+    }
+    arma::uvec r_rem  =  rind.rows(0, b_size-rem-1);
+    subind.col(sb) = join_cols(rind.rows(b_size*sb, rind.n_rows-1), r_rem);
+  }
+  return subind;
 }

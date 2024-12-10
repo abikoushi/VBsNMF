@@ -4,8 +4,13 @@ using namespace Rcpp;
 #include "KLgamma.h"
 #include "rand.h"
 #include "readline.h"
+#include <progress.hpp>
+#include <progress_bar.hpp>
+// [[Rcpp::depends(RcppProgress)]]
 
-double lr_default(double t, double delay=1, double forgetting=0.9){
+double lr_default(const double & t,
+                  const double & delay,
+                  const double & forgetting){
   return pow(t+delay, -forgetting);
 }
 
@@ -404,12 +409,14 @@ double doVB_pois_s_sub(const arma::vec & y,
                  const double & a,
                  const double & b,
                  const double & N1, 
-                 arma::mat & Z, arma::mat & W,
-                 arma::mat & logZ, arma::mat & logW,
                  arma::mat & alpha_z, 
                  arma::rowvec & beta_z,
                  arma::mat & alpha_w, 
                  arma::rowvec & beta_w){
+  arma::mat Z = randinit_gamma(alpha_z, beta_z);
+  arma::mat W = randinit_gamma(alpha_w, beta_w);
+  arma::mat logZ = log(Z);
+  arma::mat logW = log(W);
   const double ns = y.n_rows;
   const double weight = (ns/N1);
   arma::rowvec SZ = beta_w - weight*sum(Z, 0) - b;
@@ -433,7 +440,10 @@ List doVB_pois_s_mtx(const std::string & file_path,
                  const double & b,
                  const double & N1,
                  const int & Nr, const int & Nc,
-                 const int & ns){
+                 const int & ns,
+                 const double & delay,
+                 const double & forgetting,
+                 const bool & display_progress){
   arma::mat Z = arma::randg<arma::mat>(Nr, L);
   arma::mat W = arma::randg<arma::mat>(Nc, L);
   arma::mat logZ = log(Z);
@@ -443,55 +453,45 @@ List doVB_pois_s_mtx(const std::string & file_path,
   arma::rowvec beta_z = arma::ones<arma::rowvec>(L);
   arma::mat alpha_w = arma::ones<arma::mat>(Nc, L);
   arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
-  arma::vec lp = arma::zeros<arma::vec>(iter);  
+  arma::vec lp = arma::zeros<arma::vec>(iter);
+  Progress pb(iter, display_progress);
   for(int epoc=0; epoc<iter; epoc++){
     arma::uvec row_i(ns);
     arma::uvec col_i(ns);
     arma::vec val(ns);
     //int n1 = (int) N1;
-    arma::uvec bag = arma::randperm(N1, ns);
-    bag = sort(bag);
-    readmtx(row_i, col_i, val, file_path, bag);
-    arma::uvec uid_r = unique(row_i);
-    arma::uvec uid_c = unique(col_i);
-    /*
-    Rprintf("%d\n", epoc);
-    row_i.print();
-    Rprintf("\n");
-    col_i.print();
-    Rprintf("\n");
-    uid_r.print();
-    Rprintf("\n");
-    uid_c.print();
-    Rprintf("\n");
-    */
-    arma::mat Zs = Z.rows(uid_r);
-    arma::mat Ws = W.rows(uid_c);
-    arma::mat logZs = logZ.rows(uid_r);
-    arma::mat logWs = logW.rows(uid_c);
-    arma::mat alpha_zs = alpha_z.rows(uid_r); 
-    arma::mat alpha_ws = alpha_w.rows(uid_c);
-    arma::rowvec beta_zs = beta_z;
-    arma::rowvec beta_ws = beta_w;
-    
-    for(int i=0; i<uid_r.n_rows; i++){
-      row_i.rows(find(uid_r(i) == row_i)).fill(i);
+    //arma::uvec bag = arma::randperm(N1, ns);
+    arma::umat bags = randpick_c(N1, ns);
+    for(int step = 0; step < bags.n_cols; step++){
+      arma::uvec bag = sort(bags.col(step));
+      readmtx(row_i, col_i, val, file_path, bag);
+      arma::uvec uid_r = unique(row_i);
+      arma::uvec uid_c = unique(col_i);
+
+      arma::mat alpha_zs = alpha_z.rows(uid_r);
+      arma::mat alpha_ws = alpha_w.rows(uid_c);
+      arma::rowvec beta_zs = beta_z;
+      arma::rowvec beta_ws = beta_w;
+      
+      for(int i=0; i<uid_r.n_rows; i++){
+        row_i.rows(find(uid_r(i) == row_i)).fill(i);
+      }
+      for(int i=0; i<uid_c.n_rows; i++){
+        col_i.rows(find(uid_c(i) == col_i)).fill(i);      
+      }
+      
+      lp(epoc) += doVB_pois_s_sub(val, row_i, col_i, L, subiter, a, b, 
+         N1, 
+         alpha_zs, beta_zs, alpha_ws, beta_ws);
+      
+      double rho = lr_default(epoc, delay, forgetting);
+      double rho2 = 1-rho;
+      alpha_z.rows(uid_r) = rho2*alpha_z.rows(uid_r) + rho*alpha_zs;
+      beta_z = rho2*beta_z + rho*beta_zs;
+      alpha_w.rows(uid_c) = rho2*alpha_w.rows(uid_c)+ rho*alpha_ws;
+      beta_w = rho2*beta_w + rho*beta_ws;
     }
-    for(int i=0; i<uid_c.n_rows; i++){
-      col_i.rows(find(uid_c(i) == col_i)).fill(i);      
-    }
-    
-    lp(epoc) = doVB_pois_s_sub(val, row_i, col_i, L, subiter, a, b,
-                    N1,
-                    Zs, Ws, logZs, logWs,
-                    alpha_zs, beta_zs, alpha_ws, beta_ws);
-    
-    double rho = lr_default(epoc);
-    double rho2 = 1-rho;
-    alpha_z.rows(uid_r) = rho2*alpha_z.rows(uid_r) + rho*alpha_zs;
-    beta_z = rho2*beta_z + rho*beta_zs;
-    alpha_w.rows(uid_c) = rho2*alpha_w.rows(uid_c)+ rho*alpha_ws;
-    beta_w = rho2*beta_w + rho*beta_ws;
+    pb.increment();
   }
   return List::create(Named("shape_row")=alpha_z,
                       Named("rate_row")=beta_z,
@@ -499,8 +499,6 @@ List doVB_pois_s_mtx(const std::string & file_path,
                       Named("rate_col")=beta_w,
                       Named("logprob")=lp);
 }
-
-
 
 ////
 //To Do
