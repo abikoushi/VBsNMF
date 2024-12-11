@@ -15,16 +15,6 @@ scan1_csv <- function(con, skip = 0, nlines=1){
              skip = skip, comment.char = "%", sep = ",")
 }
 
-size_mtx <- function(file_path){
-  con <- file(file_path, open = "r") #Open for reading in text mode
-  #get matrix size
-  rowsize <- scan(con, what=integer(), comment.char = "%", nmax=1, quiet = TRUE)
-  colsize <- scan(con, what=integer(), nmax=1, quiet = TRUE)
-  len <- scan(con, what=integer(), nmax=1, quiet = TRUE)
-  close(con)
-  c(row=rowsize, column=colsize, nonzero=len)
-}
-
 dataloader_mtx <- function(file_path, bag){
   dims = size_mtx(file_path) #get matrix size
   rowsize <- dims[1]
@@ -33,15 +23,25 @@ dataloader_mtx <- function(file_path, bag){
   bag <- sort(bag)
   con <- file(file_path, open = "r") #Open for reading in text mode
   newL <- scan1_mtx(con, skip = bag[1]+1L) #initialize
-  out <- matrix(0, length(bag), 3)
-  out[1,] <- unlist(newL)
+  
+  rowi = integer(length(bag))
+  coli = integer(length(bag))
+  yvec = numeric(length(bag))
+  # out <- matrix(0, length(bag), 3)
+  #out[1,] <- unlist(newL)
+  rowi = newL$i
+  coli = newL$j
+  yvec = newL$v
   bag <- diff(bag)
   for(i in 1:length(bag)){
     newL <- scan1_mtx(con, skip = bag[i] - 1L)
-    out[i+1,] <- unlist(newL)
+    #out[i+1,] <- unlist(newL)
+    rowi[i] = newL$i
+    coli[i] = newL$j
+    yvec[i] = newL$v
   }
   close(con)
-  return(out)
+  return(list(rowi, coli, yvec))
 }
 
 

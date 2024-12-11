@@ -30,15 +30,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// randpick_c
-arma::umat randpick_c(int N1, int b_size);
-RcppExport SEXP _VBsNMF_randpick_c(SEXP N1SEXP, SEXP b_sizeSEXP) {
+// read_mtx
+List read_mtx(const std::string& readtxt, const arma::uvec& bag);
+RcppExport SEXP _VBsNMF_read_mtx(SEXP readtxtSEXP, SEXP bagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type N1(N1SEXP);
-    Rcpp::traits::input_parameter< int >::type b_size(b_sizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(randpick_c(N1, b_size));
+    Rcpp::traits::input_parameter< const std::string& >::type readtxt(readtxtSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type bag(bagSEXP);
+    rcpp_result_gen = Rcpp::wrap(read_mtx(readtxt, bag));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -82,28 +82,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// doVB_pois_s
-List doVB_pois_s(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& L, const int& iter, const double& a, const double& b, const double& N1, arma::mat alpha_z, arma::rowvec beta_z, arma::mat alpha_w, arma::rowvec beta_w);
-RcppExport SEXP _VBsNMF_doVB_pois_s(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP alpha_zSEXP, SEXP beta_zSEXP, SEXP alpha_wSEXP, SEXP beta_wSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type rowi(rowiSEXP);
-    Rcpp::traits::input_parameter< const arma::uvec& >::type coli(coliSEXP);
-    Rcpp::traits::input_parameter< const int& >::type L(LSEXP);
-    Rcpp::traits::input_parameter< const int& >::type iter(iterSEXP);
-    Rcpp::traits::input_parameter< const double& >::type a(aSEXP);
-    Rcpp::traits::input_parameter< const double& >::type b(bSEXP);
-    Rcpp::traits::input_parameter< const double& >::type N1(N1SEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type alpha_z(alpha_zSEXP);
-    Rcpp::traits::input_parameter< arma::rowvec >::type beta_z(beta_zSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type alpha_w(alpha_wSEXP);
-    Rcpp::traits::input_parameter< arma::rowvec >::type beta_w(beta_wSEXP);
-    rcpp_result_gen = Rcpp::wrap(doVB_pois_s(y, rowi, coli, L, iter, a, b, N1, alpha_z, beta_z, alpha_w, beta_w));
-    return rcpp_result_gen;
-END_RCPP
-}
 // doVB_pois_s_mtx
 List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns, const double& delay, const double& forgetting, const bool& display_progress);
 RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP, SEXP delaySEXP, SEXP forgettingSEXP, SEXP display_progressSEXP) {
@@ -130,10 +108,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
-    {"_VBsNMF_randpick_c", (DL_FUNC) &_VBsNMF_randpick_c, 2},
+    {"_VBsNMF_read_mtx", (DL_FUNC) &_VBsNMF_read_mtx, 2},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},
     {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 11},
-    {"_VBsNMF_doVB_pois_s", (DL_FUNC) &_VBsNMF_doVB_pois_s, 12},
     {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 13},
     {NULL, NULL, 0}
 };

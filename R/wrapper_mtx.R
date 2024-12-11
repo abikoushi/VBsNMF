@@ -1,3 +1,13 @@
+size_mtx <- function(file_path){
+  con <- file(file_path, open = "r") #Open for reading in text mode
+  #get matrix size
+  rowsize <- scan(con, what=integer(), comment.char = "%", nmax=1, quiet = TRUE)
+  colsize <- scan(con, what=integer(), nmax=1, quiet = TRUE)
+  len <- scan(con, what=integer(), nmax=1, quiet = TRUE)
+  close(con)
+  c(row=rowsize, column=colsize, nonzero=len)
+}
+
 SVBNMF <- function(file_path, rank,
                    subiter = 5,
                    n_epochs = 100,

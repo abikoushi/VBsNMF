@@ -11,17 +11,14 @@ void readmtx(arma::uvec & row_i,
              arma::vec & val,
              const std::string & readtxt,
              const arma::uvec & bag) {
-  for(int n = 0 ; n < bag.n_elem; n++){
-    int x;
-    int y;
-    double v;
-
-    std::ifstream file(readtxt);
-    std::string str;
-    
-    int index = 0;
-    while (std::getline(file, str))
-    {
+  int x;
+  int y;
+  double v;
+  std::ifstream file(readtxt);
+  std::string str;    
+  int index = 0;
+  int n = 0;
+  while (std::getline(file, str)){
       if(index == bag(n)+2){
         std::stringstream ss(str);
         std::vector<std::string> svec;
@@ -30,24 +27,31 @@ void readmtx(arma::uvec & row_i,
           getline(ss, substr, ' ');
           svec.push_back(substr);
         }
-        //int K = svec.size();
         x = stoi(svec[0]);
         y = stoi(svec[1]);
         v = stod(svec[2]);
         row_i(n) = x-1;
         col_i(n) = y-1;
         val(n) = v;
+        n++;
       }
       index++;
-      if(index>bag(bag.n_rows-1)){
+      if(n>=bag.n_rows){
         break;
       }
-    }
   }
-  //return List::create(row_i, col_i, val);
 }
 
 // [[Rcpp::export]]
+List read_mtx(const std::string & readtxt,
+             const arma::uvec & bag){
+  arma::uvec row_i(bag.n_rows);
+  arma::uvec col_i(bag.n_rows);
+  arma::vec val(bag.n_rows);
+  readmtx(row_i,col_i,val, readtxt, bag);
+  return List::create(row_i, col_i, val);
+}
+
 arma::umat randpick_c(int N1, int b_size){
   arma::uvec rind = arma::randperm(N1);
   int rem =  N1%b_size;

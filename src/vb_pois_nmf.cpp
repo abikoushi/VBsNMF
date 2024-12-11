@@ -366,7 +366,7 @@ double up_theta_s(arma::mat & alpha_z,
   return lp;
 }
 
-// [[Rcpp::export]]
+/*
 List doVB_pois_s(const arma::vec & y,
                  const arma::uvec & rowi,
                  const arma::uvec & coli,
@@ -400,6 +400,7 @@ List doVB_pois_s(const arma::vec & y,
                       Named("rate_col")=beta_w,
                       Named("logprob")=lp);
 }
+*/
 
 double doVB_pois_s_sub(const arma::vec & y,
                  const arma::uvec & rowi,
@@ -430,6 +431,28 @@ double doVB_pois_s_sub(const arma::vec & y,
   }
   return lp;
 }
+
+/*
+void dataloader_mtx(arma::uvec & row_i,
+                             arma::uvec & col_i,
+                             arma::vec & val,
+                             const std::string & file_path, const arma::uvec & bag){
+  Environment pkg = Environment::namespace_env("VBsNMF");
+  Function f = pkg["dataloader_mtx"];
+  List dat =f(Named("file_path")=file_path, Named("bag")=bag); 
+
+  arma::uvec x = dat[0];
+  x -= 1;
+  row_i = x;
+  
+  arma::uvec y = dat[1];
+  y -= 1;
+  col_i = y;
+  
+  arma::vec z = dat[2];
+  val = z;
+}
+*/
 
 // [[Rcpp::export]]
 List doVB_pois_s_mtx(const std::string & file_path,
@@ -465,9 +488,12 @@ List doVB_pois_s_mtx(const std::string & file_path,
     for(int step = 0; step < bags.n_cols; step++){
       arma::uvec bag = sort(bags.col(step));
       readmtx(row_i, col_i, val, file_path, bag);
+      
+      //dataloader_mtx(row_i, col_i, val, file_path, bag);
+      
       arma::uvec uid_r = unique(row_i);
       arma::uvec uid_c = unique(col_i);
-
+      
       arma::mat alpha_zs = alpha_z.rows(uid_r);
       arma::mat alpha_ws = alpha_w.rows(uid_c);
       arma::rowvec beta_zs = beta_z;
