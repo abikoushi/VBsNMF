@@ -8,7 +8,7 @@ size_mtx <- function(file_path){
   c(row=rowsize, column=colsize, nonzero=len)
 }
 
-SVBNMF <- function(file_path, rank,
+SVBNMF_mtx <- function(file_path, rank,
                    subiter = 5,
                    n_epochs = 100,
                    b_size = 10000,
@@ -23,7 +23,7 @@ SVBNMF <- function(file_path, rank,
                   ns = b_size, 
                   delay=delay, forgetting=forgetting,
                   display_progress=display_progress)
-  class(out) <- "nmf_pois_posterior"
+  #class(out) <- "nmf_pois_posterior"
   return(out)
 }
 

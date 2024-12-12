@@ -366,42 +366,6 @@ double up_theta_s(arma::mat & alpha_z,
   return lp;
 }
 
-/*
-List doVB_pois_s(const arma::vec & y,
-                 const arma::uvec & rowi,
-                 const arma::uvec & coli,
-                 const int & L,
-                 const int & iter,
-                 const double & a,
-                 const double & b,
-                 const double & N1, 
-                 arma::mat alpha_z, 
-                 arma::rowvec beta_z,
-                 arma::mat alpha_w, 
-                 arma::rowvec beta_w){
-  const double ns = y.n_rows;
-  arma::mat Z = randinit_gamma(alpha_z, beta_z);
-  arma::mat W = randinit_gamma(alpha_w, beta_w);
-  arma::mat logZ = log(Z);
-  arma::mat logW = log(W);
-  const double weight = (ns/N1);
-  arma::rowvec SZ = beta_w - weight*sum(Z,0) - b;
-  arma::rowvec SW = beta_z - weight*sum(W,0) - b;
-  SZ.cols(find(SZ<0.0)).fill(0.0);
-  SW.cols(find(SW<0.0)).fill(0.0);
-  arma::vec lp = arma::zeros<arma::vec>(iter);
-  for (int i=0; i<iter; i++) {
-    double lp1 = up_theta_s(alpha_z, alpha_w, beta_z, beta_w, Z, W, logZ, logW, SZ, SW, y, rowi, coli, a, b, weight);
-    lp(i) = lp1 + kld(alpha_z, beta_z, alpha_w, beta_w, a, b);
-  }
-  return List::create(Named("shape_row")=alpha_z,
-                      Named("rate_row")=beta_z,
-                      Named("shape_col")=alpha_w,
-                      Named("rate_col")=beta_w,
-                      Named("logprob")=lp);
-}
-*/
-
 double doVB_pois_s_sub(const arma::vec & y,
                  const arma::uvec & rowi,
                  const arma::uvec & coli,
@@ -432,27 +396,6 @@ double doVB_pois_s_sub(const arma::vec & y,
   return lp;
 }
 
-/*
-void dataloader_mtx(arma::uvec & row_i,
-                             arma::uvec & col_i,
-                             arma::vec & val,
-                             const std::string & file_path, const arma::uvec & bag){
-  Environment pkg = Environment::namespace_env("VBsNMF");
-  Function f = pkg["dataloader_mtx"];
-  List dat =f(Named("file_path")=file_path, Named("bag")=bag); 
-
-  arma::uvec x = dat[0];
-  x -= 1;
-  row_i = x;
-  
-  arma::uvec y = dat[1];
-  y -= 1;
-  col_i = y;
-  
-  arma::vec z = dat[2];
-  val = z;
-}
-*/
 
 // [[Rcpp::export]]
 List doVB_pois_s_mtx(const std::string & file_path,

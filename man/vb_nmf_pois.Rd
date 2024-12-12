@@ -1,6 +1,6 @@
-\name{vb_nmf_pois}
-\alias{vb_nmf_pois}
-\alias{em_nmf_pois}
+\name{VBNMF}
+\alias{VBNMF}
+\alias{EMNMF}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Variational Bayes method for sparase nonegative matrix facttorization
@@ -9,15 +9,15 @@ Variational Bayes method for sparase nonegative matrix facttorization
 Efficient implementation enjoying the sparsity of the Variational Bayes method for nonnegative matrix factorization.
 }
 \usage{
-vb_nmf_pois(Y, rank,
-            iter=100,
-            prior_shape=1,
-            prior_rate=1)
+VBNMF(Y, rank,
+      iter=100,
+      prior_shape=1,
+      prior_rate=1)
             
-em_nmf_pois(Y, rank,
-            iter=100,
-            prior_shape=1,
-            prior_rate=1)
+EMNMF(Y, rank,
+      iter=100,
+      prior_shape=1,
+      prior_rate=1)
 }
 \arguments{
   \item{Y}{
