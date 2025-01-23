@@ -11,6 +11,68 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// readRowsFromBinary
+arma::mat readRowsFromBinary(std::string filepath, arma::uvec rows, int ncols);
+RcppExport SEXP _VBsNMF_readRowsFromBinary(SEXP filepathSEXP, SEXP rowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filepath(filepathSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type rows(rowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(readRowsFromBinary(filepath, rows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// readRowsFromBinary_umat
+arma::umat readRowsFromBinary_umat(std::string filepath, arma::uvec rows, int ncols);
+RcppExport SEXP _VBsNMF_readRowsFromBinary_umat(SEXP filepathSEXP, SEXP rowsSEXP, SEXP ncolsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< std::string >::type filepath(filepathSEXP);
+    Rcpp::traits::input_parameter< arma::uvec >::type rows(rowsSEXP);
+    Rcpp::traits::input_parameter< int >::type ncols(ncolsSEXP);
+    rcpp_result_gen = Rcpp::wrap(readRowsFromBinary_umat(filepath, rows, ncols));
+    return rcpp_result_gen;
+END_RCPP
+}
+// read_bin
+List read_bin(const std::string& filepath_x, const std::string& filepath_y, const arma::uvec& bag, const int& n_dim);
+RcppExport SEXP _VBsNMF_read_bin(SEXP filepath_xSEXP, SEXP filepath_ySEXP, SEXP bagSEXP, SEXP n_dimSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::string& >::type filepath_x(filepath_xSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type filepath_y(filepath_ySEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type bag(bagSEXP);
+    Rcpp::traits::input_parameter< const int& >::type n_dim(n_dimSEXP);
+    rcpp_result_gen = Rcpp::wrap(read_bin(filepath_x, filepath_y, bag, n_dim));
+    return rcpp_result_gen;
+END_RCPP
+}
+// writeBinaryVec
+void writeBinaryVec(arma::vec data, std::string filepath);
+RcppExport SEXP _VBsNMF_writeBinaryVec(SEXP dataSEXP, SEXP filepathSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< std::string >::type filepath(filepathSEXP);
+    writeBinaryVec(data, filepath);
+    return R_NilValue;
+END_RCPP
+}
+// writeBinaryFile_umat
+void writeBinaryFile_umat(arma::umat data, std::string filepath);
+RcppExport SEXP _VBsNMF_writeBinaryFile_umat(SEXP dataSEXP, SEXP filepathSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::umat >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< std::string >::type filepath(filepathSEXP);
+    writeBinaryFile_umat(data, filepath);
+    return R_NilValue;
+END_RCPP
+}
 // doEM_pois
 List doEM_pois(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& Nr, const int& Nc, const int& L, const int& iter, const double& a, const double& b);
 RcppExport SEXP _VBsNMF_doEM_pois(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP) {
@@ -39,6 +101,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const std::string& >::type readtxt(readtxtSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type bag(bagSEXP);
     rcpp_result_gen = Rcpp::wrap(read_mtx(readtxt, bag));
+    return rcpp_result_gen;
+END_RCPP
+}
+// lr_default
+double lr_default(const double& t, const double& delay, const double& forgetting);
+RcppExport SEXP _VBsNMF_lr_default(SEXP tSEXP, SEXP delaySEXP, SEXP forgettingSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const double& >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const double& >::type delay(delaySEXP);
+    Rcpp::traits::input_parameter< const double& >::type forgetting(forgettingSEXP);
+    rcpp_result_gen = Rcpp::wrap(lr_default(t, delay, forgetting));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -107,8 +182,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_VBsNMF_readRowsFromBinary", (DL_FUNC) &_VBsNMF_readRowsFromBinary, 3},
+    {"_VBsNMF_readRowsFromBinary_umat", (DL_FUNC) &_VBsNMF_readRowsFromBinary_umat, 3},
+    {"_VBsNMF_read_bin", (DL_FUNC) &_VBsNMF_read_bin, 4},
+    {"_VBsNMF_writeBinaryVec", (DL_FUNC) &_VBsNMF_writeBinaryVec, 2},
+    {"_VBsNMF_writeBinaryFile_umat", (DL_FUNC) &_VBsNMF_writeBinaryFile_umat, 2},
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
     {"_VBsNMF_read_mtx", (DL_FUNC) &_VBsNMF_read_mtx, 2},
+    {"_VBsNMF_lr_default", (DL_FUNC) &_VBsNMF_lr_default, 3},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},
     {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 11},
     {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 13},

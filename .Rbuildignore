@@ -4,3 +4,4 @@
 ^README.md$
 \.mtx$
 ^VBparams$
+^datapath.txt$

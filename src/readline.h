@@ -8,3 +8,5 @@ void readmtx(arma::uvec & row_i,
              const arma::uvec & bag);
 
 arma::umat randpick_c(int N1, int b_size);
+
+void rankindex(arma::uvec & x, const arma::uvec & uid);

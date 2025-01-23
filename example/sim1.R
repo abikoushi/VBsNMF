@@ -2,6 +2,24 @@ library(NMF)
 library(VBsNMF)
 library(Matrix)
 library(ggplot2)
+library(rbenchmark)
+mat <- rsparsematrix(1000, 1000, 0.5, repr="T")
+writeMM(obj = mat, file = "testdat.mtx")
+
+mat <- readMM("testdat.mtx")
+
+VBsNMF:::writeBinaryFile_umat(rbind(mat@i+1, mat@j+1), "testdat.bin")
+VBsNMF:::writeBinaryVec(mat@x, "testdat_y.bin")
+
+head(cbind(mat@i,mat@j,mat@x))
+
+bags = sort(sample.int(length(mat@x),1000))
+
+bm = benchmark(res1 <- VBsNMF:::read_bin(filepath_x = "testdat.bin", filepath_y = "testdat_y.bin", bags, 3L),
+               res2 <- VBsNMF:::read_mtx("testdat.mtx", bags), order = NULL)
+bm
+
+all(res1[[2]]==res2[[3]])
 
 set_data <- function(L, nrow, ncol, center=0, scale=1){
   Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)

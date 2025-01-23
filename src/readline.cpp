@@ -75,3 +75,9 @@ arma::umat randpick_c(int N1, int b_size){
   }
   return subind;
 }
+
+void rankindex(arma::uvec & x, const arma::uvec & uid){
+  for(int i=0; i<uid.n_rows; i++){
+    x.rows(find(uid(i) == x)).fill(i);
+  }
+}

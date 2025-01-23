@@ -8,6 +8,7 @@ using namespace Rcpp;
 #include <progress_bar.hpp>
 // [[Rcpp::depends(RcppProgress)]]
 
+// [[Rcpp::export]]
 double lr_default(const double & t,
                   const double & delay,
                   const double & forgetting){
@@ -412,8 +413,6 @@ List doVB_pois_s_mtx(const std::string & file_path,
                  const bool & display_progress){
   arma::mat Z = arma::randg<arma::mat>(Nr, L);
   arma::mat W = arma::randg<arma::mat>(Nc, L);
-  arma::mat logZ = log(Z);
-  arma::mat logW = log(W);
   const double weight = (ns/N1);
   arma::mat alpha_z = arma::ones<arma::mat>(Nr, L);
   arma::rowvec beta_z = arma::ones<arma::rowvec>(L);
@@ -425,14 +424,10 @@ List doVB_pois_s_mtx(const std::string & file_path,
     arma::uvec row_i(ns);
     arma::uvec col_i(ns);
     arma::vec val(ns);
-    //int n1 = (int) N1;
-    //arma::uvec bag = arma::randperm(N1, ns);
     arma::umat bags = randpick_c(N1, ns);
     for(int step = 0; step < bags.n_cols; step++){
       arma::uvec bag = sort(bags.col(step));
       readmtx(row_i, col_i, val, file_path, bag);
-      
-      //dataloader_mtx(row_i, col_i, val, file_path, bag);
       
       arma::uvec uid_r = unique(row_i);
       arma::uvec uid_c = unique(col_i);
@@ -442,16 +437,11 @@ List doVB_pois_s_mtx(const std::string & file_path,
       arma::rowvec beta_zs = beta_z;
       arma::rowvec beta_ws = beta_w;
       
-      for(int i=0; i<uid_r.n_rows; i++){
-        row_i.rows(find(uid_r(i) == row_i)).fill(i);
-      }
-      for(int i=0; i<uid_c.n_rows; i++){
-        col_i.rows(find(uid_c(i) == col_i)).fill(i);      
-      }
-      
+      rankindex(row_i, uid_r);
+      rankindex(col_i, uid_c);
+
       lp(epoc) += doVB_pois_s_sub(val, row_i, col_i, L, subiter, a, b, 
-         N1, 
-         alpha_zs, beta_zs, alpha_ws, beta_ws);
+         N1, alpha_zs, beta_zs, alpha_ws, beta_ws);
       
       double rho = lr_default(epoc, delay, forgetting);
       double rho2 = 1-rho;

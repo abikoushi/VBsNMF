@@ -4,6 +4,19 @@ library(VBsNMF)
 library(rbenchmark)
 library(pryr)
 library(bench)
+path <- scan("datapath.txt", what = character())
+
+size = VBsNMF:::size_mtx(path[2])
+
+bm <- bench::mark(
+  res_MCA <- VBsNMF::SVBNMF_mtx(path[2], rank=2,
+                                n_epochs = 100,
+                                b_size = 10000,
+                               subiter=1,
+                               prior_shape=1, prior_rate=1,
+                               display_progress=TRUE,
+                               delay=1, forgetting=0.8)  
+)
 
 size <- VBsNMF:::size_mtx("test.mtx")
 # bag <- sort(sample.int(size[3], 100))
