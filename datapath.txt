@@ -1,2 +1,0 @@
-/Users/abeko/data/MouseCellAtlas/gene_count_cleaned.mtx
-/Users/abeko/data/Data_Bischoff2021_Lung/Exp_data_UMIcounts.mtx
