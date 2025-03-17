@@ -37,14 +37,15 @@ system.time({
   out_vb <- VBNMF(dat$Y, rank=2, iter=250, prior_rate=1)
 })
 plot(out_vb$logprob[-1], type="l")
+plot(dat$Y, basemean(out_vb)%*%coefmean(out_vb))
+abline(0,1,col="grey",lty=2)
 
 system.time({
-  out_em <- em_nmf_pois(dat$Y, rank=2, iter=100, prior_rate=1)
+  out_em <- VBsNMF:::EMNMF(dat$Y, rank=2, iter=250, prior_rate=1)
 })
-plot(out_em$logprob, type="l")
-
-sqrt(mean((dat$Y-basemean(out_vb)%*%coefmean(out_vb))^2))
-sqrt(mean((dat$Y-out_em$Z%*%t(out_em$W))^2))
+# plot(out_em$logprob, type="l")
+#sqrt(mean((dat$Y-basemean(out_vb)%*%coefmean(out_vb))^2))
+#sqrt(mean((dat$Y-out_em$Z%*%t(out_em$W))^2))
 
 ###
 #missing

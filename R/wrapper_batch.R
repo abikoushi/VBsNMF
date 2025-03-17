@@ -8,8 +8,8 @@ VBNMF <- function(Y, rank, iter=100,
     ni <- rep(Y@Dim[2],Y@Dim[1])
     nj <- rep(Y@Dim[1],Y@Dim[2])
     for(k in 1:length(wch)){
-      ni[Y@i[wch[k]]] <- ni[Y@i[wch[k]]]-1
-      nj[Y@j[wch[k]]] <- nj[Y@j[wch[k]]]-1  
+      ni[Y@i[wch[k]]] <- ni[Y@i[wch[k]]] - 1
+      nj[Y@j[wch[k]]] <- nj[Y@j[wch[k]]] - 1
     }
     wrow <- ni/Y@Dim[1]
     wcol <- nj/Y@Dim[2]
@@ -49,9 +49,9 @@ EMNMF <- function(Y, rank, iter=100, prior_shape=1, prior_rate=1){
     Y <- as(Y, "TsparseMatrix")
   }
   out <- doEM_pois(y = Y@x, rowi = Y@i, coli = Y@j,
-                     Y@Dim[1], Y@Dim[2],
-                     L = rank, iter=iter,
-                     a = prior_shape, b = prior_rate)
+                   Y@Dim[1], Y@Dim[2],
+                   L = rank, iter=iter,
+                   a = prior_shape, b = prior_rate)
 
   return(out)
 }

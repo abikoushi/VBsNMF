@@ -16,6 +16,26 @@ double lr_default(const double & t,
 }
 
 //shape parameters
+double up_A(arma::mat & alpha,
+             const arma::mat & logV_up,
+             const arma::mat & logV_con,
+             const arma::vec & y,
+             const arma::uvec & up_i,
+             const arma::uvec & con_i,
+             const double & a){
+  //initialize by hyper parameter
+  alpha.fill(a);
+  double lp = 0;
+  //inclement sufficient statistics
+  arma::mat r = exp(logV_up.rows(up_i) + logV_con.rows(con_i));
+  arma::vec R = sum(r, 1);
+  r.each_col() /= R;
+  r.each_col() %= y;
+  alpha.rows(up_i) += r;
+  lp +=  sum( y % log(R) );
+  return lp;
+}
+
 double up_Az(arma::mat & alpha_z,
              const arma::mat & logZ,
              const arma::mat & logW,
@@ -54,6 +74,26 @@ double up_Aw(arma::mat & alpha_w,
     r = y(n)*(r/R);
     alpha_w.row(coli(n)) += r;
     lp +=  y(n)*log(R);
+  }
+  return lp;
+}
+
+double up_B(const arma::mat & alpha,
+             arma::mat & beta,
+             arma::mat & V_up,
+             arma::mat & V_con,
+             arma::mat & logV_up,
+             const double & b){
+  int L = V_up.n_cols;
+  double lp = 0;
+  beta.fill(b);
+  //Rprintf("b\n");
+  for(int l=0; l<L; l++){
+    double B2 = sum(V_con.col(l));
+    lp -= B2;
+    beta.col(l) += B2;
+    V_up.col(l) = alpha.col(l)/beta(l);
+    up_log_gamma(logV_up, alpha.col(l), log(beta(l)), l);
   }
   return lp;
 }
@@ -103,7 +143,6 @@ double up_Bw(const arma::mat & alpha_w,
   return lp;
 }
 
-
 double up_theta(arma::mat & alpha_z,
                 arma::mat & alpha_w,
                 arma::mat & beta_z,
@@ -118,13 +157,13 @@ double up_theta(arma::mat & alpha_z,
                 const double & a,
                 const double & b){
   double lp = 0;
-  up_Az(alpha_z,logZ,logW,y,rowi,coli,a);
-  up_Bz(alpha_z,beta_z,Z,W,logZ,rowi,coli,b);
-  lp += up_Aw(alpha_w,logZ,logW,y,rowi,coli,a);
-  lp += up_Bw(alpha_w,beta_w,Z,W,logW,rowi,coli,b);
+  up_A(alpha_z, logZ, logW, y, rowi, coli, a);
+  up_B(alpha_z, beta_z, Z, W, logZ, b);
+  lp += up_A(alpha_w, logW, logZ, y, coli, rowi, a);
+  lp += up_B(alpha_w, beta_w, W, Z, logW, b);
   return lp;
 }
-
+  
 // [[Rcpp::export]]
 List doVB_pois(const arma::vec & y,
                const arma::uvec & rowi,
