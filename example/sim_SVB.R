@@ -4,30 +4,6 @@ library(VBsNMF)
 library(rbenchmark)
 library(pryr)
 library(bench)
-path <- scan("datapath.txt", what = character())
-
-size = VBsNMF:::size_mtx(path[2])
-
-bm <- bench::mark(
-  res_MCA <- VBsNMF::SVBNMF_mtx(path[2], rank=2,
-                                n_epochs = 100,
-                                b_size = 10000,
-                               subiter=1,
-                               prior_shape=1, prior_rate=1,
-                               display_progress=TRUE,
-                               delay=1, forgetting=0.8)  
-)
-
-size <- VBsNMF:::size_mtx("test.mtx")
-# bag <- sort(sample.int(size[3], 100))
-# 
-# #VBsNMF:::readmtx("test.mtx",bag)
-# benchmark(res1 = VBsNMF:::dataloader_mtx(file_path = "test.mtx", bag = bag),
-#           res2 = VBsNMF:::read_mtx(readtxt = "test.mtx", bag = bag))
-# res1 = VBsNMF:::dataloader_mtx(file_path = "test.mtx", bag = bag)
-# res2 = VBsNMF:::read_mtx(readtxt = "test.mtx", bag = bag)
-# res1[[1]]
-# c(res2[[1]])
 
 set_data <- function(L, nrow, ncol, center=0, scale=1){
   Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)
@@ -54,14 +30,15 @@ fit <-  basemean(out)%*%coefmean(out)
 
 writeMM(Y,"test.mtx")
 hist(dat$Y, breaks = "FD")
+length(dat$Y)
 bench::mark({
-out_s <- VBsNMF:::SVBNMF("test.mtx",
+out_s <- VBsNMF:::SVBNMF_mtx("test.mtx",
                          rank = 2,
-                         b_size = 10000,
-                         subiter = 5,
-                         forgetting = 0.8, delay = 1,
+                         lr_param = c(15,0.8),
+                         b_size = 1000,
+                         subiter = 1,
                          n_epochs = 200)
-})
+}, iterations = 1)
 
 plot(out_s$logprob[-1], type="l")
 
@@ -78,7 +55,3 @@ ggplot(data=NULL, aes(x=c(dat$Y), y=c(fit_s)))+
   scale_fill_gradient(low="grey30", high = "grey90")+
   theme_classic(16)+labs(x="observerd", y="fitted")
 
-# ca005 <- rgb(0,0,0,0.01)
-# Y <- readMM("test.mtx")
-# plot(fit_s, as.matrix(Y), col=ca005, cex=0.5)
-# abline(0,1, col="grey")

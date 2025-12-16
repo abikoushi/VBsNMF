@@ -92,6 +92,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// check_lr
+double check_lr(const int& epoc, const arma::vec& lr_param, const std::string& lr_type);
+RcppExport SEXP _VBsNMF_check_lr(SEXP epocSEXP, SEXP lr_paramSEXP, SEXP lr_typeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int& >::type epoc(epocSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lr_param(lr_paramSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type lr_type(lr_typeSEXP);
+    rcpp_result_gen = Rcpp::wrap(check_lr(epoc, lr_param, lr_type));
+    return rcpp_result_gen;
+END_RCPP
+}
 // read_mtx
 List read_mtx(const std::string& readtxt, const arma::uvec& bag);
 RcppExport SEXP _VBsNMF_read_mtx(SEXP readtxtSEXP, SEXP bagSEXP) {
@@ -158,8 +171,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // doVB_pois_s_mtx
-List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns, const double& delay, const double& forgetting, const bool& display_progress);
-RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP, SEXP delaySEXP, SEXP forgettingSEXP, SEXP display_progressSEXP) {
+List doVB_pois_s_mtx(const std::string& file_path, const int& L, const int& iter, const int& subiter, const double& a, const double& b, const double& N1, const int& Nr, const int& Nc, const int& ns, const arma::vec& lr_param, const std::string& lr_type, const bool& display_progress);
+RcppExport SEXP _VBsNMF_doVB_pois_s_mtx(SEXP file_pathSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP subiterSEXP, SEXP aSEXP, SEXP bSEXP, SEXP N1SEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP nsSEXP, SEXP lr_paramSEXP, SEXP lr_typeSEXP, SEXP display_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -173,10 +186,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const int& >::type Nr(NrSEXP);
     Rcpp::traits::input_parameter< const int& >::type Nc(NcSEXP);
     Rcpp::traits::input_parameter< const int& >::type ns(nsSEXP);
-    Rcpp::traits::input_parameter< const double& >::type delay(delaySEXP);
-    Rcpp::traits::input_parameter< const double& >::type forgetting(forgettingSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type lr_param(lr_paramSEXP);
+    Rcpp::traits::input_parameter< const std::string& >::type lr_type(lr_typeSEXP);
     Rcpp::traits::input_parameter< const bool& >::type display_progress(display_progressSEXP);
-    rcpp_result_gen = Rcpp::wrap(doVB_pois_s_mtx(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, delay, forgetting, display_progress));
+    rcpp_result_gen = Rcpp::wrap(doVB_pois_s_mtx(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, lr_param, lr_type, display_progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -188,6 +201,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_writeBinaryVec", (DL_FUNC) &_VBsNMF_writeBinaryVec, 2},
     {"_VBsNMF_writeBinaryFile_umat", (DL_FUNC) &_VBsNMF_writeBinaryFile_umat, 2},
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
+    {"_VBsNMF_check_lr", (DL_FUNC) &_VBsNMF_check_lr, 3},
     {"_VBsNMF_read_mtx", (DL_FUNC) &_VBsNMF_read_mtx, 2},
     {"_VBsNMF_lr_default", (DL_FUNC) &_VBsNMF_lr_default, 3},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},

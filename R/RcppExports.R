@@ -25,6 +25,10 @@ doEM_pois <- function(y, rowi, coli, Nr, Nc, L, iter, a, b) {
     .Call(`_VBsNMF_doEM_pois`, y, rowi, coli, Nr, Nc, L, iter, a, b)
 }
 
+check_lr <- function(epoc, lr_param, lr_type) {
+    .Call(`_VBsNMF_check_lr`, epoc, lr_param, lr_type)
+}
+
 read_mtx <- function(readtxt, bag) {
     .Call(`_VBsNMF_read_mtx`, readtxt, bag)
 }
@@ -41,7 +45,7 @@ doVB_pois_na <- function(y, rowi, coli, Nr, Nc, L, iter, a, b, wrow, wcol) {
     .Call(`_VBsNMF_doVB_pois_na`, y, rowi, coli, Nr, Nc, L, iter, a, b, wrow, wcol)
 }
 
-doVB_pois_s_mtx <- function(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, delay, forgetting, display_progress) {
-    .Call(`_VBsNMF_doVB_pois_s_mtx`, file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, delay, forgetting, display_progress)
+doVB_pois_s_mtx <- function(file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, lr_param, lr_type, display_progress) {
+    .Call(`_VBsNMF_doVB_pois_s_mtx`, file_path, L, iter, subiter, a, b, N1, Nr, Nc, ns, lr_param, lr_type, display_progress)
 }
 

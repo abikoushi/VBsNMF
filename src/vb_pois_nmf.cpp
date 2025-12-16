@@ -4,6 +4,7 @@ using namespace Rcpp;
 #include "KLgamma.h"
 #include "rand.h"
 #include "readline.h"
+#include "lr.h"
 #include <progress.hpp>
 #include <progress_bar.hpp>
 // [[Rcpp::depends(RcppProgress)]]
@@ -447,8 +448,8 @@ List doVB_pois_s_mtx(const std::string & file_path,
                  const double & N1,
                  const int & Nr, const int & Nc,
                  const int & ns,
-                 const double & delay,
-                 const double & forgetting,
+                 const arma::vec & lr_param,
+                 const std::string & lr_type,
                  const bool & display_progress){
   arma::mat Z = arma::randg<arma::mat>(Nr, L);
   arma::mat W = arma::randg<arma::mat>(Nc, L);
@@ -458,6 +459,8 @@ List doVB_pois_s_mtx(const std::string & file_path,
   arma::mat alpha_w = arma::ones<arma::mat>(Nc, L);
   arma::rowvec beta_w = arma::ones<arma::rowvec>(L);
   arma::vec lp = arma::zeros<arma::vec>(iter);
+  std::unique_ptr<lr> g;
+  set_lr_method(g, lr_type);
   Progress pb(iter, display_progress);
   for(int epoc=0; epoc<iter; epoc++){
     arma::uvec row_i(ns);
@@ -482,7 +485,7 @@ List doVB_pois_s_mtx(const std::string & file_path,
       lp(epoc) += doVB_pois_s_sub(val, row_i, col_i, L, subiter, a, b, 
          N1, alpha_zs, beta_zs, alpha_ws, beta_ws);
       
-      double rho = lr_default(epoc, delay, forgetting);
+      double rho = g -> lr_t(epoc, lr_param);
       double rho2 = 1-rho;
       alpha_z.rows(uid_r) = rho2*alpha_z.rows(uid_r) + rho*alpha_zs;
       beta_z = rho2*beta_z + rho*beta_zs;

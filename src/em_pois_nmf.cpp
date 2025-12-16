@@ -4,7 +4,6 @@ using namespace Rcpp;
 #include "KLgamma.h"
 #include "rand.h"
 
-
 //shape parameters
 double up_Aem(arma::mat & alpha_z,
             arma::mat & alpha_w,
