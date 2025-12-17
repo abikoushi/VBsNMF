@@ -117,19 +117,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// lr_default
-double lr_default(const double& t, const double& delay, const double& forgetting);
-RcppExport SEXP _VBsNMF_lr_default(SEXP tSEXP, SEXP delaySEXP, SEXP forgettingSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double& >::type t(tSEXP);
-    Rcpp::traits::input_parameter< const double& >::type delay(delaySEXP);
-    Rcpp::traits::input_parameter< const double& >::type forgetting(forgettingSEXP);
-    rcpp_result_gen = Rcpp::wrap(lr_default(t, delay, forgetting));
-    return rcpp_result_gen;
-END_RCPP
-}
 // doVB_pois
 List doVB_pois(const arma::vec& y, const arma::uvec& rowi, const arma::uvec& coli, const int& Nr, const int& Nc, const int& L, const int& iter, const double& a, const double& b);
 RcppExport SEXP _VBsNMF_doVB_pois(SEXP ySEXP, SEXP rowiSEXP, SEXP coliSEXP, SEXP NrSEXP, SEXP NcSEXP, SEXP LSEXP, SEXP iterSEXP, SEXP aSEXP, SEXP bSEXP) {
@@ -203,7 +190,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_VBsNMF_doEM_pois", (DL_FUNC) &_VBsNMF_doEM_pois, 9},
     {"_VBsNMF_check_lr", (DL_FUNC) &_VBsNMF_check_lr, 3},
     {"_VBsNMF_read_mtx", (DL_FUNC) &_VBsNMF_read_mtx, 2},
-    {"_VBsNMF_lr_default", (DL_FUNC) &_VBsNMF_lr_default, 3},
     {"_VBsNMF_doVB_pois", (DL_FUNC) &_VBsNMF_doVB_pois, 9},
     {"_VBsNMF_doVB_pois_na", (DL_FUNC) &_VBsNMF_doVB_pois_na, 11},
     {"_VBsNMF_doVB_pois_s_mtx", (DL_FUNC) &_VBsNMF_doVB_pois_s_mtx, 13},

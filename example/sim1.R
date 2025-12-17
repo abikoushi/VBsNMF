@@ -3,9 +3,26 @@ library(VBsNMF)
 library(Matrix)
 library(ggplot2)
 library(rbenchmark)
+set_data <- function(L, nrow, ncol, center=0, scale=1){
+  Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)
+  Z <- sweep(Z,1,rowMeans(Z)-center)
+  W <- matrix(rnorm(L*ncol,0,scale), L, ncol)
+  W <- sweep(W,1,rowMeans(W)-center)
+  Y <- matrix(rpois(nrow*ncol, exp(Z)%*%exp(W)), nrow, ncol)
+  list(Y=Y,Z=Z,W=t(W))
+}
+
+#run batch VB
+set.seed(1); dat <- set_data(2, 100, 100)
+system.time({
+  out_vb <- VBNMF(dat$Y, rank=2, iter=250, prior_rate=1)
+})
+
+plot(out_vb$logprob, type="l")
+#
+
 mat <- rsparsematrix(1000, 1000, 0.5, repr="T")
 writeMM(obj = mat, file = "testdat.mtx")
-
 mat <- readMM("testdat.mtx")
 
 VBsNMF:::writeBinaryFile_umat(rbind(mat@i+1, mat@j+1), "testdat.bin")
@@ -21,14 +38,6 @@ bm
 
 all(res1[[2]]==res2[[3]])
 
-set_data <- function(L, nrow, ncol, center=0, scale=1){
-  Z <- matrix(rnorm(L*nrow,0,scale), nrow, L)
-  Z <- sweep(Z,1,rowMeans(Z)-center)
-  W <- matrix(rnorm(L*ncol,0,scale), L, ncol)
-  W <- sweep(W,1,rowMeans(W)-center)
-  Y <- matrix(rpois(nrow*ncol, exp(Z)%*%exp(W)), nrow, ncol)
-  list(Y=Y,Z=Z,W=t(W))
-}
 
 #####
 #VB vs. EM

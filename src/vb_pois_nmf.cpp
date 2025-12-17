@@ -9,12 +9,6 @@ using namespace Rcpp;
 #include <progress_bar.hpp>
 // [[Rcpp::depends(RcppProgress)]]
 
-// [[Rcpp::export]]
-double lr_default(const double & t,
-                  const double & delay,
-                  const double & forgetting){
-  return pow(t+delay, -forgetting);
-}
 
 //shape parameters
 double up_A(arma::mat & alpha,
@@ -37,48 +31,6 @@ double up_A(arma::mat & alpha,
   return lp;
 }
 
-double up_Az(arma::mat & alpha_z,
-             const arma::mat & logZ,
-             const arma::mat & logW,
-             const arma::vec & y,
-             const arma::uvec & rowi,
-             const arma::uvec & coli,
-             const double & a){
-  //initialize by hyper parameter
-  alpha_z.fill(a);
-  double lp = 0;
-  //inclement sufficient statistics
-  for(int n=0; n<y.n_rows; n++){
-    arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
-    double R = sum(r);
-    r = y(n)*(r/R);
-    alpha_z.row(rowi(n)) += r;
-    lp +=  y(n)*log(R);
-  }
-  return lp;
-}
-
-double up_Aw(arma::mat & alpha_w,
-             const arma::mat & logZ,
-             const arma::mat & logW,
-             const arma::vec & y,
-             const arma::uvec & rowi,
-             const arma::uvec & coli,
-             const double & a){
-  //initialize by hyper parameter
-  alpha_w.fill(a);
-  double lp = 0;
-  //inclement sufficient statistics
-  for(int n=0; n<y.n_rows; n++){
-    arma::rowvec r = exp(logZ.row(rowi(n)) + logW.row(coli(n)));
-    double R = sum(r);
-    r = y(n)*(r/R);
-    alpha_w.row(coli(n)) += r;
-    lp +=  y(n)*log(R);
-  }
-  return lp;
-}
-
 double up_B(const arma::mat & alpha,
              arma::mat & beta,
              arma::mat & V_up,
@@ -95,51 +47,6 @@ double up_B(const arma::mat & alpha,
     beta.col(l) += B2;
     V_up.col(l) = alpha.col(l)/beta(l);
     up_log_gamma(logV_up, alpha.col(l), log(beta(l)), l);
-  }
-  return lp;
-}
-
-double up_Bz(const arma::mat & alpha_z,
-             arma::mat & beta_z,
-             arma::mat & Z,
-             arma::mat & W,
-             arma::mat & logZ,
-             const arma::uvec & rowi,
-             const arma::uvec & coli,
-             const double & b){
-  int L = Z.n_cols;
-  double lp = 0;
-  beta_z.fill(b);
-  //Rprintf("b\n");
-  for(int l=0; l<L; l++){
-    double B2 = sum(W.col(l));
-    lp -= B2;
-    beta_z.col(l) += B2;
-    Z.col(l) = alpha_z.col(l)/beta_z(l);
-    up_log_gamma(logZ, alpha_z.col(l), log(beta_z(l)), l);
-  }
-  return lp;
-}
-
-double up_Bw(const arma::mat & alpha_w,
-             arma::mat & beta_w,
-             arma::mat & Z,
-             arma::mat & W,
-             arma::mat & logW,
-             const arma::uvec & rowi,
-             const arma::uvec & coli,
-             const double & b){
-  int L = Z.n_cols;
-  double lp = 0;
-  beta_w.fill(b);
-  for(int l=0; l<L; l++){
-    double B1 = sum(Z.col(l)); 
-    lp -= B1;
-    beta_w.col(l) += B1;
-    W.col(l) = alpha_w.col(l)/beta_w(l);
-    up_log_gamma(logW, alpha_w.col(l), log(beta_w(l)), l);
-    double B2 = sum(W.col(l));
-    lp -= B2;
   }
   return lp;
 }
@@ -289,6 +196,10 @@ List doVB_pois_na(const arma::vec & y,
                       Named("rate_col")=beta_w,
                       Named("logprob")=lp);
 }
+
+/////
+//stochastic minibatch
+/////
 
 double up_Az_s(arma::mat & alpha_z,
                const arma::mat & logZ,
@@ -502,6 +413,7 @@ List doVB_pois_s_mtx(const std::string & file_path,
 }
 
 ////
-//To Do
+//To Do:
+//doVB_pois_s_bin : stochastic mini-batch for binary file
 //doVB_pois_s_na : stochastic mini-batch with na
 ////

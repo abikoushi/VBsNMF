@@ -33,10 +33,6 @@ read_mtx <- function(readtxt, bag) {
     .Call(`_VBsNMF_read_mtx`, readtxt, bag)
 }
 
-lr_default <- function(t, delay, forgetting) {
-    .Call(`_VBsNMF_lr_default`, t, delay, forgetting)
-}
-
 doVB_pois <- function(y, rowi, coli, Nr, Nc, L, iter, a, b) {
     .Call(`_VBsNMF_doVB_pois`, y, rowi, coli, Nr, Nc, L, iter, a, b)
 }
